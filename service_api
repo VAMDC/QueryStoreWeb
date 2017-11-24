@@ -1,0 +1,179 @@
+Query Store web service API
+============================
+
+Service endpoint
+------------------
+
+service url:
+http://vm-calc-lerma01:8080/QueryStore/
+
+clean url : 
+http://querystore.vamdc.eu
+
+Ask for request registration
+-----------------------------
+
+Method Name : NotificationListener
+
+Parameters : 
+  - queryToken : request id from the node
+  - accededResource : get_tapendpoint(request),  
+  - resourceVersion : version of the database 
+  - userEmail
+  - usedClient : client that sent the request to the node
+  - accessType : HTTP method ( HEAD or GET )
+  - outputFormatVersion : vamdc standards version  
+  - dataURL : complete request url 
+  - query :  tap request
+  
+  
+
+
+Get one query by id
+--------------------
+
+Method name :  InfoQuery
+
+Parameter : 
+
+  - uuid : id of a request in the query store, mandatory
+
+Return :
+  
+- query details as JSON 
+- 204 status code if empty
+
+Sample request : 
+
+http://vm-calc-lerma01:8080/QSNotificationListener/InfoQuery?uuid=a140c4ba-d4e7-49a7-bf4f-3e8398883e71 
+
+Sample successful request response : 
+
+{
+  "queryInformation": {
+    "dataURL": "http:\/\/vm-calc-lerma01.obspm.fr:8080\/QSNotificationListener\/data\/b5ddcae7-733b-4651-a1d2-156919dd99ae.xsams",
+    "querySubmissionTimestamps": [1481018200675],
+    "queryRexecutionLink": null,
+    "accededResource": "http:\/\/topbase.obspm.fr\/12.07\/vamdc\/tap",
+    "resourceVersion": "1",
+    "outputFormatVersion": "12.07",
+    "biblioGraphicReferences": "    @misc {BTopbase-2016-12-06-10-56-42, howpublished={database}, author = {N.N.}, year = {2016}, url{http:\/\/topbase.obspm.fr\/12.07\/vamdc\/tap\/sync?LANG=VSS2&REQUEST=doQuery&FORMAT=XSAMS&QUERY=select+*+where+%28%28AtomSymbol+%3D+%27be%27%29%29}}        @article {BTopbase-12, author = {Tully, John A. and Seaton, Michael J. and Berrington, Keith A.}, title = {Atomic data for opacity calculations. XIV - The beryllium sequence}, journal = {Journal of Physics B Atomic Molecular Physics}, volume = {23}, pages = {3811,3837}, year = {1990}}        @article {BTopbase-17, author = {Peach, G. and Saraph, H. E. and Seaton, M. J.}, title = {Atomic data for opacity calculations. IX. The lithium isoelectronic sequence}, journal = {Journal of Physics B Atomic Molecular Physics}, volume = {21}, pages = {3669,3683}, year = {1988}}        @article {BTopbase-19, author = {Fernley, J. A. and Seaton, M. J. and Taylor, K. T.}, title = {Atomic data for opacity calculations. VII - Energy levels, f values and photoionisation cross sections for He-like ions}, journal = {Journal of Physics B Atomic Molecular Physics}, volume = {20}, pages = {6457,6476}, year = {1987}}        @article {BTopbase-26, author = {Seaton, M. J.}, title = {}, journal = {unpublished}, year = {1995}}    ",
+    "queryInvocationDetails": [{
+      "queryToken": "topbase:a24dcc51-b501-43fc-8f96-b356bd200c3f:head",
+      "timestamp": 1485868744697
+    }],
+    "UUID": "b5ddcae7-733b-4651-a1d2-156919dd99ae",
+    "parameters": ["query=select * where ( atomsymbol='be' );"]
+  }
+}
+
+Sample failed request response : 
+
+{
+	"queryError": {
+		"phase": "org.rda.QueryStore.business.pipeline.tasks.VamdcReferenceGetter",
+		"errorMessage": "javax.xml.transform.TransformerException: com.sun.org.apache.xml.internal.utils.WrappedRuntimeException: XML document structures must start and end within the same entity.",
+		"UUID": "a43e99fb-8abd-42ba-9c4c-15fe521d78a6",
+		"queryToken": "vald:c8bfe386-4d0d-4577-8024-61b2c1264f9a:get",
+		"parameters": "query=select *",
+		"timestamp": "1490777305576"
+	}
+}
+
+
+Get queries in a time interval 
+---------------------------------
+
+
+Method name :  FindQueries
+
+Parameter : 
+
+  - from : lower limit of interval, timestamp in milliseconds, optional
+  
+  - to :  upper limit of interval, timestamp in milliseconds, optional
+
+Return :
+  
+-  a list of query ids as JSON, empty if no result
+
+
+Sample request : 
+
+http://vm-calc-lerma01:8080/QSNotificationListener/FindQueries
+
+Sample response : 
+
+{
+	"Queries": [{
+		"querySubmissionTimestamps": [1480946560193, 1481018011918],
+		"accededResource": "http:\/\/topbase.obspm.fr\/12.07\/vamdc\/tap",
+		"resourceVersion": "1",
+		"outputFormatVersion": "12.07",
+		"queryInvocationDetails": [{
+			"queryToken": "starkb:10ba1435-93d3-48a4-b9d5-58a9fc12ea29:head",
+			"timestamp": 1485871501199
+		}],
+		"UUID": "199aa9d7-365b-40d4-b3e3-5f0171639761",
+		"parameters": ["query=select * where ( atomsymbol='he' );"]
+	}, {
+		"querySubmissionTimestamps": [1481018200675],
+		"accededResource": "http:\/\/topbase.obspm.fr\/12.07\/vamdc\/tap",
+		"resourceVersion": "1",
+		"outputFormatVersion": "12.07",
+		"UUID": "b5ddcae7-733b-4651-a1d2-156919dd99ae",
+		"parameters": ["query=select * where ( atomsymbol='be' );"]
+	}]
+}
+
+
+User associate an id to a query
+-----------------------------------
+
+Method name :  AssociationService
+
+Parameters : 
+
+  - queryToken : token of a query
+  
+  - email :  email of user asking for association
+  
+  - usedClient : client from which association has been performed
+  
+
+Return :
+  
+-  UUID
+
+http://vm-calc-lerma01:8080/QueryStore/AssociationService
+
+
+Portal associate an id to a query
+-----------------------------------
+
+Method name :  PortalAssociationService
+
+Parameters : 
+
+  - queryToken : token of a query
+  
+  - email :  email of user asking for association
+  
+  - usedClient : client from which association has been performed
+  
+  - userIp : ip of user doing the request on the portal
+  
+
+Return :
+  
+-  UUID
+
+http://vm-calc-lerma01:8080/QueryStore/PortalAssociationService
+
+Success :
+{"UUIDCorrectlyAssociated":"97f4493b-98a3-49e2-b6e0-27a45677b1a5"}
+
+Errors : 
+{"UUIDInErrorOnHeadQuery":"97f4493b-98a3-49e2-b6e0-27a45677b1a5"}
+{"UUIDInErrorOnGetQuery":"97f4493b-98a3-49e2-b6e0-27a45677b1a5"}
+

@@ -1,0 +1,124 @@
+body{
+  background-color : #E3E7E8;
+}
+
+body h1, h2{
+  font-size : 1.2em;
+  font-weight : bold;
+}
+
+body h2{
+  font-size : 1em;
+}
+
+.hiddable-div{
+  margin-bottom : 0.5em;
+}
+
+.references .hiddable-div button{
+  float : none;
+}
+
+.first-level{
+  margin-left : 1em;
+}
+
+.references{
+    background-color: white;
+    padding-left: 0.5em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    border: solid 1px #a5a3a3;
+    background : #f3f3f3;
+    opacity: 100%;
+    z-index: 10;
+    width: 600px;
+    position: absolute;
+}
+
+.scrollable{
+  width: 600px;
+  height : 300px;
+  overflow-y: auto;
+}
+
+.clickable{
+  text-decoration: underline;
+  color: blue;
+  cursor :pointer;
+}
+
+.hidden{
+  visibility: hidden;
+}
+
+.visible{
+  visibility: visible;
+}
+
+.references button{
+  float : right;
+}
+
+.underline{
+  text-decoration: underline;
+}
+
+#data-table table{
+  width : 90%;
+  margin : 1em auto 1em auto;
+  overflow:auto;
+  table-layout : fixed;
+}
+
+#data-table .pure-table th, td{
+  text-align : center;
+  word-wrap: break-word;
+}
+
+.pure-table td{
+  border : 1px solid #cbcbcb;
+}
+
+.pure-table th{
+  cursor : pointer;
+}
+
+.wrong-value{
+  color : red;
+}
+
+.nodes-checkboxes{
+  word-break: break-all;
+}
+
+#content{
+  background-color : white;
+  margin-left : auto;
+  margin-right : auto;
+  width : 1200px;
+  padding-left : 0.5em;
+  padding-top : 0.5em;
+}
+
+#menu{
+  width : 100%;
+  margin-bottom : 1em;
+  border-bottom : 1px solid #eee;
+}
+
+#data{
+  width : 100%;
+  padding-top : 1em;
+  padding-bottom : 1em;
+}
+
+#form{
+  margin-right : 1em;
+}
+
+#footer{
+  padding-top : 0.5em;
+  padding-bottom : 0.5em;
+  text-align : center;
+}
