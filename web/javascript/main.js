@@ -7,6 +7,44 @@ var moment = require('moment');
 var Datetime = require('react-datetime');
 var parse = require("bibtex-parser");
 
+/* Add filter function to array 
+*  whatever browser is used
+**/
+if (!Array.prototype.filter) {
+  Array.prototype.filter = function(fun/*, thisArg*/) {
+    'use strict';
+
+    if (this === void 0 || this === null) {
+      throw new TypeError();
+    }
+
+    var t = Object(this);
+    var len = t.length >>> 0;
+    if (typeof fun !== 'function') {
+      throw new TypeError();
+    }
+
+    var res = [];
+    var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+    for (var i = 0; i < len; i++) {
+      if (i in t) {
+        var val = t[i];
+
+        // NOTE: Technically this should Object.defineProperty at
+        //       the next index, as push can be affected by
+        //       properties on Object.prototype and Array.prototype.
+        //       But that method's new, and collisions should be
+        //       rare, so use the more-compatible alternative.
+        if (fun.call(thisArg, val, i, t)) {
+          res.push(val);
+        }
+      }
+    }
+
+    return res;
+  };
+}
+
 /**
  * Displays text in a paragraph
  * @param text
@@ -23,22 +61,24 @@ function MessageBox(props){
 * @param defaultMenuItem   option selected by default
 * @param menuItems         list of options
 */
-var PureMenuBox = React.createClass({
+class PureMenuBox extends React.Component{
 
-  getInitialState : function() {
-    return { selectedLabel : this.props.defaultMenuItem };
-  },
+  constructor(props){
+    super(props);
+    this.state = { selectedLabel : this.props.defaultMenuItem };
+    this.isSelectedLabel = this.isSelectedLabel.bind(this);
+  }
 
   /**
   * returns true if label corresponds to the selected item
   */
-  isSelectedLabel : function(label) {
+  isSelectedLabel(label) {
     if (this.state.selectedLabel === label)
       return true;
     return false;
-  },
+  }
 
-  render : function() {
+  render() {
     var self = this;
 
     var setSelectedLabel = function(label){
@@ -59,7 +99,7 @@ var PureMenuBox = React.createClass({
       </div>
     );
   }
-});
+}
 
 /**
 * Menu item
@@ -67,17 +107,18 @@ var PureMenuBox = React.createClass({
 * @param isSelected  boolean indicating if the item is selected ( true if selected )
 * @param onClick     action performed when item is selected
 */
-var PureMenuElement = React.createClass({
+class PureMenuElement extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {isSelected : false};
+    this.handleClick = this.handleClick.bind(this);
+  }
 
-  getInitialState : function() {
-    return {isSelected : false};
-  },
-
-  handleClick : function() {
+  handleClick() {
     this.props.onClick(this.props.label);
-  },
+  }
 
-  render : function() {
+  render() {
     var btnClass = classNames({
           'pure-menu-item': true,
           'pure-menu-selected': this.props.isSelected
@@ -87,7 +128,7 @@ var PureMenuElement = React.createClass({
       <li className={btnClass}><a  href="javascript:;" className="pure-menu-link" onClick={this.handleClick}>{this.props.label}</a></li>
     );
   }
-});
+}
 
 /**
  * Element containing several ReactTableElement
@@ -98,28 +139,30 @@ var PureMenuElement = React.createClass({
  * @param lineFilter    line hidden if lineFilter(line) is false
  *  
  */
-var ReactTableElement = React.createClass({
-
-
+class ReactTableElement extends React.Component{
+  constructor(props){
+    super(props);
+    this.getDisplayedData = this.getDisplayedData.bind(this);
+  }
+  
   /**
    * returns a list of values to diplay in a tr element : [{value:"", type:""}]
    */
-  getDisplayedData : function(data_row){
+  getDisplayedData(data_row){
     var self = this;
     var result = [];
     for (var column in self.props.tableKeys){
       result.push({ 'value':data_row[self.props.tableKeys[column].field], 'type':self.props.tableKeys[column].type});
     }
     return result;
+  }
 
-  },
-
-  componentDidMount: function() {
+  componentDidMount() {
     var newTableObject = document.getElementById("data-table-content");
     sorttable.makeSortable(newTableObject);
-  },
+  }
   
-  render : function(){
+  render(){
     var self = this;
     var className = "pure-table "+this.props.class;
 
@@ -143,7 +186,7 @@ var ReactTableElement = React.createClass({
     </div>
     );
   }
-});
+}
 
 /**
  * tr element in tbody
@@ -213,42 +256,50 @@ function TableCellTextElement(props){
 * @param content        displayed content
 * @param handleClick    function called when link is clicked
 */
-var TableCellSelectableTextElement = React.createClass({
+class TableCellSelectableTextElement extends React.Component{
 
-  handleClick : function(event){
+  constructor(props){
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(event){
     this.props.handleClick(event, this.props.content);
-  },
+  }
 
-  render : function(){
+  render(){
     return (
       <td><span className="clickable" onClick={this.handleClick}>{this.props.content}</span></td>
     );
   }
-});
+};
 
 /**
 * td element containing a sql-like query
 * @param content   displayed content
 */
-var TableCellQueryElement = React.createClass({
+class TableCellQueryElement extends React.Component{
 
-  fullText : null,
-  shortText : null,
 
-  getInitialState : function(){
-    return {displayedText : this.getDisplayedText(this.props.content.replace("query=", "").replace(";", ""))};
-  },
 
-  getDisplayedText : function(text){
+  constructor(props){
+    super(props);
+    this.fullText = null;
+    this.shortText = null;    
+    this.state = {
+      displayedText : this.getDisplayedText(this.props.content.replace("query=", "").replace(";", ""))
+    };
+    this.getDisplayedText = this.getDisplayedText.bind(this);
+  }
+
+  getDisplayedText(text){
     var result = text;
     if(text.length > 30)
       result = text.substr(0, 29) + " \u2026";
     return result;
-  },
-
-
-
-  render : function(){
+  }
+  
+  render(){
     this.fullText = this.props.content.replace("query=", "").replace(";", "");
     this.shortText = this.getDisplayedText(this.fullText);
     return (
@@ -257,8 +308,7 @@ var TableCellQueryElement = React.createClass({
     >{this.state.displayedText}</td>
     );
   }
-
-});
+};
 
 /**
  * td element displaying a <a> element
@@ -280,7 +330,7 @@ function TableCellTimestampsElement(props){
   const content = props.content.sort();
   var dates = [];
   for(var i = 0; i < content.length; i++){
-    dates.push(<li key={i}>{timestamp_to_date(content[i])}</li>);
+    dates.push(<li key={i}>{StoreUtilities.timestampToDate(content[i])}</li>);
   }
 
   return (
@@ -312,7 +362,7 @@ var tableCellFactory = {
     else if(cell.type === this.cellTypes.query)
       return <TableCellQueryElement content={cell.value.join(', ')} key={cell.key}/>
     else if(cell.type === this.cellTypes.uuid){
-      return <TableCellUrlElement text={cell.value} href={'http://cite.vamdc.eu/references.html?uuid='+cell.value} key={cell.key}/>
+      return <TableCellUrlElement text={cell.value} href={SITE_URL + 'references.html?uuid='+cell.value} key={cell.key}/>
     }
     else
       return <TableCellTextElement content={cell.value} key={cell.key}/>
@@ -340,13 +390,15 @@ function ExternalLinkElement (props){
  * @param name input element name
  * @param onChange action performed when content is changed
  */
-var InputDateComponent = React.createClass({
+class InputDateComponent extends React.Component{
 
-  getInitialState : function(){
-    return {value : ''};
-  },
+  constructor(props){
+    super(props);
+    this.state = {value : ''};
+    this.change = this.change.bind(this);
+  }
 
-  change: function(moment){
+  change(moment){
     var value = "";   
     try{
       if ( moment.toString().trim() !== "" ){
@@ -361,10 +413,9 @@ var InputDateComponent = React.createClass({
     this.setState({value : value}, function(){
       this.props.onChange(this.props.name , this.state.value);
     });
-  },
+  }
 
-  render: function() {
-
+  render() {
     return (
     <div>
       <label>{this.props.label}</label>
@@ -372,7 +423,7 @@ var InputDateComponent = React.createClass({
     </div>
     );
   }
-});
+}
 
 
 /**
@@ -381,13 +432,15 @@ var InputDateComponent = React.createClass({
  * @param name input element name
  * @param onChange action performed when content is changed
  */
-var InputNumberComponent = React.createClass({
+class InputNumberComponent extends React.Component{
 
-  getInitialState : function(){
-    return {value : '', inputClass : true};
-  },
+  constructor(props){
+    super(props);
+    this.state = {value : '', inputClass : true};
+    this.handleChange = this.handleChange.bind(this);
+  }
 
-  handleChange : function(event){
+  handleChange(event){
     var inputClass = "wrong-value";
     const value = event.target.value;
     if(($.isNumeric(value) && Math.floor(value) == value) || value.trim() === ''  ) {
@@ -397,9 +450,9 @@ var InputNumberComponent = React.createClass({
     this.setState({value : event.target.value, inputClass : inputClass}, function(){
       this.props.onChange(this.props.name , this.state.value);
     });
-  },
+  }
 
-  render : function(){
+  render(){
     return(
       <div>
           <label>{this.props.label}</label>
@@ -408,27 +461,32 @@ var InputNumberComponent = React.createClass({
     );
   }
 
-});
+}
 
 /**
  * button with pure-css styling
  * @param label text displayed in button
  * @param action action executed when button is clicked
  */
-var PureButtonComponent = React.createClass({
+class PureButtonComponent extends React.Component{
 
-  handleClick : function(event){
+  constructor(props){
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(event){
     this.props.action();
-  },
+  }
 
-  render : function(){
+  render(){
     return(
       <div>
         <button className="pure-button" type="button" onClick={this.handleClick}>{this.props.label}</button>
       </div>
     );
   }
-});
+}
 
 /**
  * Pure grid with two columns, widths are editable
@@ -461,27 +519,27 @@ function PureGridTwoColumnsBox (props){
  * @param doQuery action performed when request is executed
  *
  */
-var QueriesFormBox = React.createClass({
+class QueriesFormBox extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {
+      concepts : []
+    };
+  }
 
   /**
    * get suggestions from distant service
    */
-  componentDidMount: function() {
+  componentDidMount() {
       this.serverRequest = $.get(this.props.serviceApi+"/FindQueries", function (result) {
         this.setState({
           concepts : result
         });
       }.bind(this));
-  },
+  }
 
-  getInitialState : function() {
-    return {
-      concepts : []
-    };
-  },
-
-
-  render : function(){
+  render(){
     return (
       <div id="form">
         <form className="pure-form pure-form-stacked">
@@ -494,29 +552,32 @@ var QueriesFormBox = React.createClass({
       </div>
     );
   }
-});
+}
 
 /**
  * @param content        div content
  * @param contentName    content name in button text
  */
-var HiddableDiv = React.createClass({
-  getInitialState : function() {
-    return {
+class HiddableDiv extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {
       visibilityClass : "hidden",
       buttonText : "Show",
     };
-  },
+    this.switchVisibility = this.switchVisibility.bind(this);
+  }
 
-  switchVisibility : function(){
+  switchVisibility(){
     if(this.state.visibilityClass === "hidden"){
       this.setState({visibilityClass : "visible", buttonText:"Hide"})
     }else{
       this.setState({visibilityClass : "hidden", buttonText:"Show"})
     }
-  },
+  }
 
-  render : function(){
+  render(){
     return (
       <div className="hiddable-div">
         <p>
@@ -530,8 +591,7 @@ var HiddableDiv = React.createClass({
       </div>
     );
   }
-
-});
+}
 
 /**
  * Display a checkbox
@@ -541,8 +601,13 @@ var HiddableDiv = React.createClass({
  * @param onChange  function called when the box is clicked
  * 
  */
-var CheckBox = React.createClass({    
-  render : function(){
+class CheckBox extends React.Component{
+
+  constructor(props){
+    super(props);
+  }
+  
+  render(){
     return(
       <input type="checkbox" value={this.props.value} 
       id={this.props.id} checked={this.props.checked}
@@ -550,28 +615,35 @@ var CheckBox = React.createClass({
     );
   }
    
-});
+}
 
 /**
  * @param values      list of values to display
+ * @param labels      list of labels to display
  * @param elementId
  * @param title       title displayed before checkboxes
  * @param toggleAll
  * 
  */
- var CheckBoxesList = React.createClass({
-  
-  getInitialState : function() {
-    return {
+class CheckBoxesList extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {
       //to be displayed as checkboxes
       boxes : [],
       //dictionary resource_name : boolean
       //true if resource is selected
       boxesStatus : {}
     };
-  },
+
+    this.onCheckBoxChange = this.onCheckBoxChange.bind(this);
+    this.selectAllBoxes = this.selectAllBoxes.bind(this);
+    this.deselectAllBoxes = this.deselectAllBoxes.bind(this);
+    this.switchAllBoxes = this.switchAllBoxes.bind(this);
+  }
   
-  componentWillReceiveProps : function(nextProps){
+  componentWillReceiveProps(nextProps){
     /**
      * all checkboxes are checked by default
      * executed once when list is received
@@ -583,13 +655,13 @@ var CheckBox = React.createClass({
       }      
       this.setState({boxesStatus : boxesStatus });   
     }    
-  },
+  }
   
   /**
    * called when checkbox status change
    * @param evt   event that triggered the call
    */
-  onCheckBoxChange : function(evt){
+  onCheckBoxChange(evt){
     var checked = evt.target.checked;
     var value = evt.target.value;
     var updatedBoxes = this.state.boxesStatus;    
@@ -597,47 +669,46 @@ var CheckBox = React.createClass({
     this.setState({boxesStatus : updatedBoxes}, function(){
       this.props.toggled(checked, value);
     });
-  },
+  }
   
   /**
    * all checkboxes checked
    */
-  selectAllNodes(){
-    this.switchAllNodes(true);
-  },
+  selectAllBoxes(){
+    this.switchAllBoxes(true);
+  }
 
   /**
    * all checkboxes unchecked
    */  
-  deselectAllNodes(){
-    this.switchAllNodes(false);
-  },
+  deselectAllBoxes(){
+    this.switchAllBoxes(false);
+  }
  
   /**
    * toggle all checkboxes selection
    * @param   boolean
    */
-  switchAllNodes(checked){
+  switchAllBoxes(checked){
     var updatedBoxes = this.state.boxesStatus;   
-    for(var key in updatedBoxes) 
-      updatedBoxes[key] = checked;   
+    for(var key in updatedBoxes) {
+      updatedBoxes[key] = checked;
+    }
       
     this.setState({boxesStatus : updatedBoxes}, function(){
       this.props.toggleAll(checked);
     });
-  },  
+  }
    
-  render : function(){
+  render(){
     var boxes = [];
-    
     for(var i = 0; i<this.props.values.length; i++){      
       boxes.push(<p key={i}>
-                    <CheckBox value={this.props.values[i]} 
-                    
+                    <CheckBox value={this.props.values[i]}                     
                     id={this.props.elementId+i}
                     onChange={this.onCheckBoxChange}
                     checked={this.state.boxesStatus[this.props.values[i]]}/>                    
-                    <label htmlFor={this.props.elementId+i}>{this.props.values[i]}</label>
+                    <label htmlFor={this.props.elementId+i}>{this.props.labels[i]}</label>
                   </p>);
     }
 
@@ -647,11 +718,10 @@ var CheckBox = React.createClass({
     if(this.props.values.length > 0){
       title = this.props.title;
       buttons = <p>
-                  <button onClick={this.selectAllNodes}>Select all</button>
-                  <button onClick={this.deselectAllNodes}>Unselect all</button>      
+                  <button onClick={this.selectAllBoxes}>Select all</button>
+                  <button onClick={this.deselectAllBoxes}>Unselect all</button>      
                 </p>
     }
-
     return (
       <div>
         <p><strong>{title}</strong></p>
@@ -660,8 +730,7 @@ var CheckBox = React.createClass({
       </div>
     );
   }
-
-});
+}
 
 /**
  * @param bibtex      bibtex content to format and display
@@ -672,35 +741,39 @@ var CheckBox = React.createClass({
  * @param positionY   y position for the box in pixels
  *
  */
-var QueryDetailBox = React.createClass({
-  // width : 600,
-  getInitialState : function() {
-    return {
+class QueryDetailBox extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {
       positionX : 0,
       positionY : 0
     };
-  },
+    this.getBibtex = this.getBibtex.bind(this);
+    this.getQueryList = this.getQueryList.bind(this);
+    this.getTopPosition = this.getTopPosition.bind(this);
+  }  
 
  /**
  *  Return html formatted bibtex
  */
-  getBibtex : function(){
+  getBibtex(){
     var bibtex = parse(this.props.bibtex);
 
     var result = [];
     var i = 1;
 
     for (var k in bibtex) {
-      if( get_property_in_object("TITLE", bibtex[k]) !== "not available" &&
-          get_property_in_object("JOURNAL", bibtex[k]) !== "not available"){
+      if( StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available" &&
+          StoreUtilities.getPropertyInObject("JOURNAL", bibtex[k]) !== "not available"){
         result.push(
           <ul key={i}>
-              <li><span className="underline">Title</span> : {get_property_in_object("TITLE", bibtex[k])}</li>
-              <li><span className="underline">Journal</span> : {get_property_in_object("JOURNAL", bibtex[k])}</li>
-              <li><span className="underline">Authors</span> : {get_property_in_object("AUTHOR", bibtex[k])}</li>
-              <li><span className="underline">Pages</span> : {get_property_in_object("PAGES", bibtex[k])}</li>
-              <li><span className="underline">Volume</span> : {get_property_in_object("VOLUME", bibtex[k])}</li>
-              <li><span className="underline">Year</span> : {get_property_in_object("YEAR", bibtex[k])}</li>
+              <li><span className="underline">Title</span> : {StoreUtilities.getPropertyInObject("TITLE", bibtex[k])}</li>
+              <li><span className="underline">Journal</span> : {StoreUtilities.getPropertyInObject("JOURNAL", bibtex[k])}</li>
+              <li><span className="underline">Authors</span> : {StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k])}</li>
+              <li><span className="underline">Pages</span> : {StoreUtilities.getPropertyInObject("PAGES", bibtex[k])}</li>
+              <li><span className="underline">Volume</span> : {StoreUtilities.getPropertyInObject("VOLUME", bibtex[k])}</li>
+              <li><span className="underline">Year</span> : {StoreUtilities.getPropertyInObject("YEAR", bibtex[k])}</li>
           </ul>)
         i++;
         result.push(<hr key={i}/>)
@@ -715,31 +788,29 @@ var QueryDetailBox = React.createClass({
         result.push(<p><strong key="0">No reference</strong></p>);
       }
     }
-
     return result;
-  },
+  }
 
-/**
-* Return list of query date formatted in html
-*/
-
-  getQueryList : function(){
+  /**
+  * Return list of query date formatted in html
+  */
+  getQueryList(){
     var result = [];
     if(this.props.query !== null){
       var timestamps = this.props.query["querySubmissionTimestamps"];
       for(var i=0; i<timestamps.length; i++){
         //timestamps are converted into dates
-        result.push(<li key={i+1}>{timestamp_to_date(timestamps[i])}</li>);
+        result.push(<li key={i+1}>{StoreUtilities.timestampToDate(timestamps[i])}</li>);
       }
     }
     return result;
-  },
+  }
 
   /**
   * Return value of top css property for the div
   * @param suggestedtop  value suggested from the cursor position
   */
-  getTopPosition : function(suggestedtop){
+  getTopPosition(suggestedtop){
     var top = suggestedtop;
     var height = Math.round($(".references").height());
     var excess = document.body.clientHeight - ( top + height );
@@ -747,10 +818,9 @@ var QueryDetailBox = React.createClass({
       top = top + excess;
     }
     return top;
-  },
+  }
 
-  render : function(){
-
+  render(){
     var references = this.props.bibtex !== null ? this.getBibtex() : '';
     var bibtex_src = this.props.bibtex !== null ? this.props.bibtex : '';
     var timestamps = this.getQueryList();
@@ -792,45 +862,53 @@ var QueryDetailBox = React.createClass({
       </div>
     );
   }
-});
+}
 
 /**
  * Display queries in store
  * @param serviceApi url of web service
  */
-var QueriesBox = React.createClass({
+class QueriesBox extends React.Component{
 
-  serviceMethod : "FindQueries",
-
-  tableHeader : ['Request', 'Acceded resource', 'UUID'],
-  tableHeaderMapping : {  'Request': {
+  constructor(props){
+    super(props);
+    this.serviceMethod = "FindQueries";
+    this.tableHeader = ['Request', 'Acceded resource', 'UUID'];
+    this.tableHeaderMapping = {  'Request': {
                             field:'parameters',
                             type: tableCellFactory.cellTypes.query},
                           'Acceded resource':{
-                              field:'accededResource',
+                              field:'resourceName',
                               type : tableCellFactory.cellTypes.text},
                           'UUID': {
                             field : 'UUID',
                             type : tableCellFactory.cellTypes.uuid},
-                        },
+                        };
 
-  getInitialState: function() {
-    return {queries:[],
+    this.state =  {queries:[],
             parameters : {},
             rightComponent : null,
             visibleNodes : [],
-            allNodes : [],
+            allNodesUrls : [],      // urls of vamdc nodes
+            allNodesNames : [],     // names of vamdc nodes
             allNodesData : []
           };
-  },
-  
+
+    this.toggled = this.toggled.bind(this);
+    this.toggleAll = this.toggleAll.bind(this);
+    this.fillDisplayedData = this.fillDisplayedData.bind(this);
+    this.setRightComponent = this.setRightComponent.bind(this);
+    this.getQueryParameters = this.getQueryParameters.bind(this);
+    this.queryApiForQueries = this.queryApiForQueries.bind(this);
+  }
+    
   /**
    * update table content when a node 
    * has been selected/unselected
    * @param isChecked   boolean
    * @param value       selected node id
    */
-  toggled : function(isChecked, value){
+  toggled(isChecked, value){
     var nodes = this.state.visibleNodes;
     if(isChecked){      
       nodes.push(value);
@@ -843,17 +921,17 @@ var QueriesBox = React.createClass({
     this.setState({visibleNodes : nodes}, function(){
       this.fillDisplayedData();
     });
-  },
+  }
   
   /**
    * update table content when the whole node list 
    * has been selected/unselected
    * @param isChecked   boolean
    */
-  toggleAll : function(isChecked){
+  toggleAll(isChecked){
     if(isChecked){
-      var allNodes = this.state.allNodes;
-      this.setState({visibleNodes : allNodes}, function(){
+      var allNodesUrls = this.state.allNodesUrls;
+      this.setState({visibleNodes : allNodesUrls}, function(){
         this.fillDisplayedData();
       });
     }else{
@@ -861,46 +939,48 @@ var QueriesBox = React.createClass({
         this.fillDisplayedData();
       });      
     }
-  },
+  }
   
   /**
    * Update request list in table 
    */
-  fillDisplayedData : function(){
+  fillDisplayedData(){
     var displayed = [];
-    for(var i = 0; i < this.state.queries['Queries'].length; i++){      
-      if(this.state.visibleNodes.includes(this.state.queries['Queries'][i]['accededResource'])){        
-        displayed.push(this.state.queries['Queries'][i]);    
+    for(var i = 0; i < this.state.queries['Queries'].length; i++){
+      var query = this.state.queries['Queries'][i];
+      if(this.state.visibleNodes.includes(query['accededResource'])){        
+        // add a name property to the node description in request object
+        query['resourceName'] = StoreUtilities.registry.getNodeName(query['accededResource']);
+        displayed.push(query);    
       }
     }
 
     this.setState({allNodesData : displayed}, function(){
       this.setRightComponent();
-    });
-    
-  },
+    });    
+  }
 
   /**
   *  Fill right of the page with the list of queries in an html table
   */
-  setRightComponent : function(){
+  setRightComponent(){
     var right_component;
-    if(is_empty_table(this.state.queries) == false)
+    if(StoreUtilities.isEmptyTable(this.state.queries) == false)
       right_component =   <ReactTableElement  tableHeader={this.tableHeader}
                           tableKeys={this.tableHeaderMapping}
                           tableContent={this.state.allNodesData }
                           title=''
-                          lineFilter={hasGet}/>;
+                          lineFilter={StoreUtilities.hasGet}/>;
     else
       right_component = <MessageBox text="No data available" />;
 
     this.setState({rightComponent : right_component});
-  },
+  }
 
   /**
    * returns GET query, species are sorted in a node map
    */
-  getQueryParameters : function(){
+  getQueryParameters(){
     var parameters = [];
     
     for (var value in this.state.parameters) {
@@ -909,41 +989,51 @@ var QueriesBox = React.createClass({
         parameters.push(value+"="+this.state.parameters[value]);
     }
     return parameters.join("&");
-  },
+  }
 
   /**
    * sends a request to the service to get list of queries in the store
    */
-  queryApiForQueries : function(){
+  queryApiForQueries(){
     var self = this;
     $.ajax({
-      url: this.props.serviceApi+self.serviceMethod+"?"+self.getQueryParameters(),
+      url: self.props.serviceApi+self.serviceMethod+"?"+self.getQueryParameters(),
       dataType: 'json',
       cache: true,
       beforeSend : function(jqXHR, settings){
         self.setState({rightComponent : <MessageBox text="Please wait while data are loading"/>});
       },
-      success: function(data) {        
-        var nodes = [];
+      success: function(data) {
+        var nodes_urls = [];
+        var nodes_names = []        
         // get a list of all nodes 
         for(var i = 0; i < data['Queries'].length; i++){
-          if(!nodes.includes(data['Queries'][i]['accededResource']))
-            nodes.push(data['Queries'][i]['accededResource']);
-        }       
-        
-        self.setState({queries : data, allNodes : nodes, visibleNodes : nodes}, function(){
+          var node_url = data['Queries'][i]['accededResource'];
+          var node_name = StoreUtilities.registry.getNodeName(node_url);
+          if(!nodes_names.includes(node_name)){
+            nodes_names.push(node_name);            
+          }
+        }    
+        // sort node names in alphabetical order  
+        nodes_names.sort();
+        // get corresponding urls
+        for(var i = 0; i < nodes_names.length; i++){
+          nodes_urls.push(StoreUtilities.registry.getNodeUrl(nodes_names[i]));           
+        } 
+
+        self.setState({queries : data, allNodesUrls : nodes_urls, allNodesNames : nodes_names ,visibleNodes : nodes_urls}, function(){
           self.fillDisplayedData();          
         });
 
       }.bind(this),
       error: function(xhr, status, err) {
-        var message = get_error_message(xhr.responseText);
+        var message = StoreUtilities.getErrorMessage(xhr.responseText);
         self.setState({rightComponent : <MessageBox text={message}/>});
       }.bind(this)
     });
-  },  
+  }
 
-  render : function(){
+  render(){
     var self = this;
     var update_function = function(parameter, value){
       var new_parameters = self.state.parameters;
@@ -955,8 +1045,15 @@ var QueriesBox = React.createClass({
     };
     // form to select displayed data
     var left_component = <div className="nodes-checkboxes">
-                        <QueriesFormBox onChange={update_function} doQuery={this.queryApiForQueries} serviceApi={this.props.serviceApi}/>
-                        <CheckBoxesList key="0" values={this.state.allNodes} elementId="nodesboxes" toggled={this.toggled} toggleAll={this.toggleAll} title="Acceded resources"/>
+                          <QueriesFormBox onChange={update_function}
+                          doQuery={this.queryApiForQueries}
+                          serviceApi={this.props.serviceApi}/>
+                          <CheckBoxesList key="0" values={this.state.allNodesUrls}
+                          labels={this.state.allNodesNames}
+                          elementId="nodesboxes"
+                          toggled={this.toggled}
+                          toggleAll={this.toggleAll}
+                          title="Acceded resources"/>
                         </div>;
 
     return(
@@ -965,7 +1062,7 @@ var QueriesBox = React.createClass({
       </div>
     );
   }
-});
+}
 
 /**
  * Home page
@@ -1013,33 +1110,32 @@ function CreditsBox(props){
  * Main container
  * @param serviceApi url of service returning the list of queries
  */
-var MainComponent = React.createClass({
+class MainComponent extends React.Component{
 
-  defaultSelection : "Home",
-
-  getInitialState : function() {
-    return { selectedBox : this.defaultSelection };
-  },
+  constructor(props){
+    super(props);
+    this.defaultSelection = "Home";
+    this.state = { selectedBox : this.defaultSelection };
+    this.getSections = this.getSections.bind(this);
+  }
 
   /**
    * returns web site main sections with attached displayed objects
    */
-  getSections : function(){
+  getSections(){
     return {  'Home' : <HomePageBox />,
               'Queries': <QueriesBox serviceApi={this.props.serviceApi}/>,
               'Credits': <CreditsBox />
           };
-  },
+  }
 
-  render : function() {
+  render() {
     var self = this;
-
     var setSelectedBox = function(label){
       self.setState({selectedBox : label});
     }
 
     var sections = this.getSections();
-
     return (
       <div>
         <div id="menu">
@@ -1051,8 +1147,7 @@ var MainComponent = React.createClass({
       </div>
     );
   }
-
-});
+}
 
 ReactDOM.render(
   <MainComponent serviceApi={SERVICE_URL} />,

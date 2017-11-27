@@ -142,16 +142,16 @@ var QueryDetailBox = React.createClass({
       var i = 1;
 
       for (var k in bibtex) {
-        if( get_property_in_object("TITLE", bibtex[k]) !== "not available" &&
-            get_property_in_object("JOURNAL", bibtex[k]) !== "not available"){
+        if( StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available" &&
+            StoreUtilities.getPropertyInObject("JOURNAL", bibtex[k]) !== "not available"){
           result.push(
             <ul key={i}>
-                <li><span className="underline">Title</span> : {get_property_in_object("TITLE", bibtex[k])}</li>
-                <li><span className="underline">Journal</span> : {get_property_in_object("JOURNAL", bibtex[k])}</li>
-                <li><span className="underline">Authors</span> : {get_property_in_object("AUTHOR", bibtex[k])}</li>
-                <li><span className="underline">Pages</span> : {get_property_in_object("PAGES", bibtex[k])}</li>
-                <li><span className="underline">Volume</span> : {get_property_in_object("VOLUME", bibtex[k])}</li>
-                <li><span className="underline">Year</span> : {get_property_in_object("YEAR", bibtex[k])}</li>
+                <li><span className="underline">Title</span> : {StoreUtilities.getPropertyInObject("TITLE", bibtex[k])}</li>
+                <li><span className="underline">Journal</span> : {StoreUtilities.getPropertyInObject("JOURNAL", bibtex[k])}</li>
+                <li><span className="underline">Authors</span> : {StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k])}</li>
+                <li><span className="underline">Pages</span> : {StoreUtilities.getPropertyInObject("PAGES", bibtex[k])}</li>
+                <li><span className="underline">Volume</span> : {StoreUtilities.getPropertyInObject("VOLUME", bibtex[k])}</li>
+                <li><span className="underline">Year</span> : {StoreUtilities.getPropertyInObject("YEAR", bibtex[k])}</li>
             </ul>)
           i++;
           result.push(<hr key={i}/>)
@@ -186,14 +186,14 @@ var QueryDetailBox = React.createClass({
       var printed_timestamps = []; 
       for(var i=0; i<timestamps.length; i++){
         // timestamp of get request only
-        if(is_get(timestamps[i])){
+        if(StoreUtilities.isGet(timestamps[i])){
           printed_timestamps.push(timestamps[i]['timestamp']);
         }
       }
       printed_timestamps = printed_timestamps.sort();
       for(var i=0; i<printed_timestamps.length; i++){
         //timestamps are converted into dates
-        result.push(<li key={i+1}>{timestamp_to_date(printed_timestamps[i])}</li>);
+        result.push(<li key={i+1}>{StoreUtilities.timestampToDate(printed_timestamps[i])}</li>);
       }
     }
     return result;
@@ -346,6 +346,6 @@ var MainComponent = React.createClass({
 });
 
 ReactDOM.render(
-  <MainComponent serviceApi={SERVICE_URL} queryId={get_url_parameter("uuid")}/>,
+  <MainComponent serviceApi={SERVICE_URL} queryId={StoreUtilities.getUrlParameter("uuid")}/>,
   document.getElementById('data')
 );
