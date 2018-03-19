@@ -193,28 +193,10 @@ var ReactTableElement = function (_React$Component3) {
   function ReactTableElement(props) {
     _classCallCheck(this, ReactTableElement);
 
-    var _this3 = _possibleConstructorReturn(this, (ReactTableElement.__proto__ || Object.getPrototypeOf(ReactTableElement)).call(this, props));
-
-    _this3.getDisplayedData = _this3.getDisplayedData.bind(_this3);
-    return _this3;
+    return _possibleConstructorReturn(this, (ReactTableElement.__proto__ || Object.getPrototypeOf(ReactTableElement)).call(this, props));
   }
 
-  /**
-   * returns a list of values to diplay in a tr element : [{value:"", type:""}]
-   */
-
-
   _createClass(ReactTableElement, [{
-    key: 'getDisplayedData',
-    value: function getDisplayedData(data_row) {
-      var self = this;
-      var result = [];
-      for (var column in self.props.tableKeys) {
-        result.push({ 'value': data_row[self.props.tableKeys[column].field], 'type': self.props.tableKeys[column].type });
-      }
-      return result;
-    }
-  }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
       var newTableObject = document.getElementById("data-table-content");
@@ -234,28 +216,177 @@ var ReactTableElement = function (_React$Component3) {
           null,
           this.props.title
         ),
+        React.createElement(PaginatedTable, { 'class': this.props.class, tableHeader: this.props.tableHeader, rows: this.props.tableContent, lineFilter: this.props.lineFilter, tableKeys: this.props.tableKeys })
+      );
+    }
+  }]);
+
+  return ReactTableElement;
+}(React.Component);
+
+var PaginatedTable = function (_React$Component4) {
+  _inherits(PaginatedTable, _React$Component4);
+
+  function PaginatedTable() {
+    _classCallCheck(this, PaginatedTable);
+
+    var _this4 = _possibleConstructorReturn(this, (PaginatedTable.__proto__ || Object.getPrototypeOf(PaginatedTable)).call(this));
+
+    _this4.state = {
+      currentPage: 1,
+      todosPerPage: 15
+    };
+    _this4.handleClick = _this4.handleClick.bind(_this4);
+    _this4.getDisplayedData = _this4.getDisplayedData.bind(_this4);
+    _this4.previousPage = _this4.previousPage.bind(_this4);
+    _this4.nextPage = _this4.nextPage.bind(_this4);
+    return _this4;
+  }
+
+  _createClass(PaginatedTable, [{
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (nextProps.rows.legnth !== this.props.rows.length) {
+        this.setState({ currentPage: 1 });
+      }
+    }
+  }, {
+    key: 'handleClick',
+    value: function handleClick(event) {
+      this.setState({
+        currentPage: Number(event.target.id)
+      });
+    }
+  }, {
+    key: 'previousPage',
+    value: function previousPage() {
+      if (this.state.currentPage > 1) {
+        this.setState({ currentPage: this.state.currentPage - 1 });
+      }
+    }
+  }, {
+    key: 'nextPage',
+    value: function nextPage(pageNumbers) {
+      console.log("next page");
+      console.log(pageNumbers);
+      if (this.state.currentPage < pageNumbers) {
+        console.log("in condition");
+        this.setState({ currentPage: this.state.currentPage + 1 });
+      }
+    }
+
+    /**
+     * returns a list of values to diplay in a tr element : [{value:"", type:""}]
+     */
+
+  }, {
+    key: 'getDisplayedData',
+    value: function getDisplayedData(data_row) {
+      var self = this;
+      var result = [];
+      for (var column in self.props.tableKeys) {
+        result.push({ 'value': data_row[self.props.tableKeys[column].field], 'type': self.props.tableKeys[column].type });
+      }
+      return result;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this5 = this;
+
+      var self = this;
+      var _state = this.state,
+          currentPage = _state.currentPage,
+          todosPerPage = _state.todosPerPage;
+
+      var todos = this.props.rows.reduce(function (accumulator, row) {
+        if (self.props.lineFilter(row) === true) {
+          accumulator.push(row);
+        }
+        return accumulator;
+      }, []);
+
+      // Logic for displaying todos
+      var indexOfLastTodo = currentPage * todosPerPage;
+      var indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+      var currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
+
+      var renderTodos = currentTodos.map(function (todo, i) {
+        //displays only get requests   
+        return React.createElement(TableContentRowElement, { content: _this5.getDisplayedData(todo), key: i });
+      });
+
+      // Logic for displaying page numbers
+      var pageNumbers = [];
+      for (var i = 1; i <= Math.ceil(todos.length / todosPerPage); i++) {
+        pageNumbers.push(i);
+      }
+
+      var renderPageNumbers = pageNumbers.map(function (number) {
+        return React.createElement(
+          'button',
+          {
+            key: number,
+            id: number,
+            onClick: _this5.handleClick
+          },
+          number
+        );
+      });
+      var className = "pure-table " + this.props.class;
+      var pageString = pageNumbers.length > 0 ? this.state.currentPage + "/" + pageNumbers.length : "";
+
+      return React.createElement(
+        'table',
+        { id: 'data-table-content', className: className },
         React.createElement(
-          'table',
-          { id: 'data-table-content', className: className },
+          'thead',
+          null,
+          React.createElement(TableHeaderRowElement, { content: this.props.tableHeader })
+        ),
+        React.createElement(
+          'tbody',
+          null,
+          renderTodos
+        ),
+        React.createElement(
+          'tfoot',
+          { id: 'page-numbers' },
           React.createElement(
-            'thead',
+            'tr',
             null,
-            React.createElement(TableHeaderRowElement, { content: this.props.tableHeader })
-          ),
-          React.createElement(
-            'tbody',
-            null,
-            this.props.tableContent.map(function (data_row, i) {
-              //displays only get requests
-              if (self.props.lineFilter(data_row)) return React.createElement(TableContentRowElement, { content: self.getDisplayedData(data_row), key: i, handleClick: self.props.lineFilter });
-            })
+            React.createElement(
+              'td',
+              { colSpan: this.props.tableHeader.length },
+              React.createElement(
+                'button',
+                { className: 'pure-button spaced-button',
+                  onClick: this.previousPage
+                },
+                '<'
+              ),
+              React.createElement(
+                'span',
+                null,
+                pageString
+              ),
+              React.createElement(
+                'button',
+                { className: 'pure-button spaced-button',
+                  onClick: function onClick() {
+                    _this5.nextPage(pageNumbers.length);
+                  }
+                },
+                '>'
+              )
+            )
           )
         )
       );
     }
   }]);
 
-  return ReactTableElement;
+  return PaginatedTable;
 }(React.Component);
 
 /**
@@ -328,16 +459,16 @@ function TableCellTextElement(props) {
 * @param handleClick    function called when link is clicked
 */
 
-var TableCellSelectableTextElement = function (_React$Component4) {
-  _inherits(TableCellSelectableTextElement, _React$Component4);
+var TableCellSelectableTextElement = function (_React$Component5) {
+  _inherits(TableCellSelectableTextElement, _React$Component5);
 
   function TableCellSelectableTextElement(props) {
     _classCallCheck(this, TableCellSelectableTextElement);
 
-    var _this4 = _possibleConstructorReturn(this, (TableCellSelectableTextElement.__proto__ || Object.getPrototypeOf(TableCellSelectableTextElement)).call(this, props));
+    var _this6 = _possibleConstructorReturn(this, (TableCellSelectableTextElement.__proto__ || Object.getPrototypeOf(TableCellSelectableTextElement)).call(this, props));
 
-    _this4.handleClick = _this4.handleClick.bind(_this4);
-    return _this4;
+    _this6.handleClick = _this6.handleClick.bind(_this6);
+    return _this6;
   }
 
   _createClass(TableCellSelectableTextElement, [{
@@ -370,21 +501,21 @@ var TableCellSelectableTextElement = function (_React$Component4) {
 * @param content   displayed content
 */
 
-var TableCellQueryElement = function (_React$Component5) {
-  _inherits(TableCellQueryElement, _React$Component5);
+var TableCellQueryElement = function (_React$Component6) {
+  _inherits(TableCellQueryElement, _React$Component6);
 
   function TableCellQueryElement(props) {
     _classCallCheck(this, TableCellQueryElement);
 
-    var _this5 = _possibleConstructorReturn(this, (TableCellQueryElement.__proto__ || Object.getPrototypeOf(TableCellQueryElement)).call(this, props));
+    var _this7 = _possibleConstructorReturn(this, (TableCellQueryElement.__proto__ || Object.getPrototypeOf(TableCellQueryElement)).call(this, props));
 
-    _this5.fullText = null;
-    _this5.shortText = null;
-    _this5.state = {
-      displayedText: _this5.getDisplayedText(_this5.props.content.replace("query=", "").replace(";", ""))
+    _this7.fullText = null;
+    _this7.shortText = null;
+    _this7.state = {
+      displayedText: _this7.getDisplayedText(_this7.props.content.replace("query=", "").replace(";", ""))
     };
-    _this5.getDisplayedText = _this5.getDisplayedText.bind(_this5);
-    return _this5;
+    _this7.getDisplayedText = _this7.getDisplayedText.bind(_this7);
+    return _this7;
   }
 
   _createClass(TableCellQueryElement, [{
@@ -397,17 +528,17 @@ var TableCellQueryElement = function (_React$Component5) {
   }, {
     key: 'render',
     value: function render() {
-      var _this6 = this;
+      var _this8 = this;
 
       this.fullText = this.props.content.replace("query=", "").replace(";", "");
       this.shortText = this.getDisplayedText(this.fullText);
       return React.createElement(
         'td',
         { onMouseEnter: function onMouseEnter() {
-            _this6.setState({ displayedText: _this6.fullText });
+            _this8.setState({ displayedText: _this8.fullText });
           },
           onMouseLeave: function onMouseLeave() {
-            _this6.setState({ displayedText: _this6.shortText });
+            _this8.setState({ displayedText: _this8.shortText });
           }
         },
         this.state.displayedText
@@ -505,17 +636,17 @@ function ExternalLinkElement(props) {
  * @param onChange action performed when content is changed
  */
 
-var InputDateComponent = function (_React$Component6) {
-  _inherits(InputDateComponent, _React$Component6);
+var InputDateComponent = function (_React$Component7) {
+  _inherits(InputDateComponent, _React$Component7);
 
   function InputDateComponent(props) {
     _classCallCheck(this, InputDateComponent);
 
-    var _this7 = _possibleConstructorReturn(this, (InputDateComponent.__proto__ || Object.getPrototypeOf(InputDateComponent)).call(this, props));
+    var _this9 = _possibleConstructorReturn(this, (InputDateComponent.__proto__ || Object.getPrototypeOf(InputDateComponent)).call(this, props));
 
-    _this7.state = { value: '' };
-    _this7.change = _this7.change.bind(_this7);
-    return _this7;
+    _this9.state = { value: '' };
+    _this9.change = _this9.change.bind(_this9);
+    return _this9;
   }
 
   _createClass(InputDateComponent, [{
@@ -563,17 +694,17 @@ var InputDateComponent = function (_React$Component6) {
  */
 
 
-var InputNumberComponent = function (_React$Component7) {
-  _inherits(InputNumberComponent, _React$Component7);
+var InputNumberComponent = function (_React$Component8) {
+  _inherits(InputNumberComponent, _React$Component8);
 
   function InputNumberComponent(props) {
     _classCallCheck(this, InputNumberComponent);
 
-    var _this8 = _possibleConstructorReturn(this, (InputNumberComponent.__proto__ || Object.getPrototypeOf(InputNumberComponent)).call(this, props));
+    var _this10 = _possibleConstructorReturn(this, (InputNumberComponent.__proto__ || Object.getPrototypeOf(InputNumberComponent)).call(this, props));
 
-    _this8.state = { value: '', inputClass: true };
-    _this8.handleChange = _this8.handleChange.bind(_this8);
-    return _this8;
+    _this10.state = { value: '', inputClass: true };
+    _this10.handleChange = _this10.handleChange.bind(_this10);
+    return _this10;
   }
 
   _createClass(InputNumberComponent, [{
@@ -615,16 +746,16 @@ var InputNumberComponent = function (_React$Component7) {
  */
 
 
-var PureButtonComponent = function (_React$Component8) {
-  _inherits(PureButtonComponent, _React$Component8);
+var PureButtonComponent = function (_React$Component9) {
+  _inherits(PureButtonComponent, _React$Component9);
 
   function PureButtonComponent(props) {
     _classCallCheck(this, PureButtonComponent);
 
-    var _this9 = _possibleConstructorReturn(this, (PureButtonComponent.__proto__ || Object.getPrototypeOf(PureButtonComponent)).call(this, props));
+    var _this11 = _possibleConstructorReturn(this, (PureButtonComponent.__proto__ || Object.getPrototypeOf(PureButtonComponent)).call(this, props));
 
-    _this9.handleClick = _this9.handleClick.bind(_this9);
-    return _this9;
+    _this11.handleClick = _this11.handleClick.bind(_this11);
+    return _this11;
   }
 
   _createClass(PureButtonComponent, [{
@@ -640,7 +771,7 @@ var PureButtonComponent = function (_React$Component8) {
         null,
         React.createElement(
           'button',
-          { className: 'pure-button', type: 'button', onClick: this.handleClick },
+          { className: 'pure-button spaced-button', type: 'button', onClick: this.handleClick },
           this.props.label
         )
       );
@@ -692,18 +823,18 @@ function PureGridTwoColumnsBox(props) {
  *
  */
 
-var QueriesFormBox = function (_React$Component9) {
-  _inherits(QueriesFormBox, _React$Component9);
+var QueriesFormBox = function (_React$Component10) {
+  _inherits(QueriesFormBox, _React$Component10);
 
   function QueriesFormBox(props) {
     _classCallCheck(this, QueriesFormBox);
 
-    var _this10 = _possibleConstructorReturn(this, (QueriesFormBox.__proto__ || Object.getPrototypeOf(QueriesFormBox)).call(this, props));
+    var _this12 = _possibleConstructorReturn(this, (QueriesFormBox.__proto__ || Object.getPrototypeOf(QueriesFormBox)).call(this, props));
 
-    _this10.state = {
+    _this12.state = {
       concepts: []
     };
-    return _this10;
+    return _this12;
   }
 
   /**
@@ -750,20 +881,20 @@ var QueriesFormBox = function (_React$Component9) {
  */
 
 
-var HiddableDiv = function (_React$Component10) {
-  _inherits(HiddableDiv, _React$Component10);
+var HiddableDiv = function (_React$Component11) {
+  _inherits(HiddableDiv, _React$Component11);
 
   function HiddableDiv(props) {
     _classCallCheck(this, HiddableDiv);
 
-    var _this11 = _possibleConstructorReturn(this, (HiddableDiv.__proto__ || Object.getPrototypeOf(HiddableDiv)).call(this, props));
+    var _this13 = _possibleConstructorReturn(this, (HiddableDiv.__proto__ || Object.getPrototypeOf(HiddableDiv)).call(this, props));
 
-    _this11.state = {
+    _this13.state = {
       visibilityClass: "hidden",
       buttonText: "Show"
     };
-    _this11.switchVisibility = _this11.switchVisibility.bind(_this11);
-    return _this11;
+    _this13.switchVisibility = _this13.switchVisibility.bind(_this13);
+    return _this13;
   }
 
   _createClass(HiddableDiv, [{
@@ -786,7 +917,7 @@ var HiddableDiv = function (_React$Component10) {
           null,
           React.createElement(
             'button',
-            { onClick: this.switchVisibility },
+            { onClick: this.switchVisibility, className: 'pure-button spaced-button' },
             this.state.buttonText,
             ' ',
             this.props.contentName
@@ -814,8 +945,8 @@ var HiddableDiv = function (_React$Component10) {
  */
 
 
-var CheckBox = function (_React$Component11) {
-  _inherits(CheckBox, _React$Component11);
+var CheckBox = function (_React$Component12) {
+  _inherits(CheckBox, _React$Component12);
 
   function CheckBox(props) {
     _classCallCheck(this, CheckBox);
@@ -845,15 +976,15 @@ var CheckBox = function (_React$Component11) {
  */
 
 
-var CheckBoxesList = function (_React$Component12) {
-  _inherits(CheckBoxesList, _React$Component12);
+var CheckBoxesList = function (_React$Component13) {
+  _inherits(CheckBoxesList, _React$Component13);
 
   function CheckBoxesList(props) {
     _classCallCheck(this, CheckBoxesList);
 
-    var _this13 = _possibleConstructorReturn(this, (CheckBoxesList.__proto__ || Object.getPrototypeOf(CheckBoxesList)).call(this, props));
+    var _this15 = _possibleConstructorReturn(this, (CheckBoxesList.__proto__ || Object.getPrototypeOf(CheckBoxesList)).call(this, props));
 
-    _this13.state = {
+    _this15.state = {
       //to be displayed as checkboxes
       boxes: [],
       //dictionary resource_name : boolean
@@ -861,11 +992,11 @@ var CheckBoxesList = function (_React$Component12) {
       boxesStatus: {}
     };
 
-    _this13.onCheckBoxChange = _this13.onCheckBoxChange.bind(_this13);
-    _this13.selectAllBoxes = _this13.selectAllBoxes.bind(_this13);
-    _this13.deselectAllBoxes = _this13.deselectAllBoxes.bind(_this13);
-    _this13.switchAllBoxes = _this13.switchAllBoxes.bind(_this13);
-    return _this13;
+    _this15.onCheckBoxChange = _this15.onCheckBoxChange.bind(_this15);
+    _this15.selectAllBoxes = _this15.selectAllBoxes.bind(_this15);
+    _this15.deselectAllBoxes = _this15.deselectAllBoxes.bind(_this15);
+    _this15.switchAllBoxes = _this15.switchAllBoxes.bind(_this15);
+    return _this15;
   }
 
   _createClass(CheckBoxesList, [{
@@ -968,12 +1099,12 @@ var CheckBoxesList = function (_React$Component12) {
           null,
           React.createElement(
             'button',
-            { onClick: this.selectAllBoxes },
+            { onClick: this.selectAllBoxes, className: 'pure-button spaced-button' },
             'Select all'
           ),
           React.createElement(
             'button',
-            { onClick: this.deselectAllBoxes },
+            { onClick: this.deselectAllBoxes, className: 'pure-button spaced-button' },
             'Unselect all'
           )
         );
@@ -1010,22 +1141,22 @@ var CheckBoxesList = function (_React$Component12) {
  */
 
 
-var QueryDetailBox = function (_React$Component13) {
-  _inherits(QueryDetailBox, _React$Component13);
+var QueryDetailBox = function (_React$Component14) {
+  _inherits(QueryDetailBox, _React$Component14);
 
   function QueryDetailBox(props) {
     _classCallCheck(this, QueryDetailBox);
 
-    var _this14 = _possibleConstructorReturn(this, (QueryDetailBox.__proto__ || Object.getPrototypeOf(QueryDetailBox)).call(this, props));
+    var _this16 = _possibleConstructorReturn(this, (QueryDetailBox.__proto__ || Object.getPrototypeOf(QueryDetailBox)).call(this, props));
 
-    _this14.state = {
+    _this16.state = {
       positionX: 0,
       positionY: 0
     };
-    _this14.getBibtex = _this14.getBibtex.bind(_this14);
-    _this14.getQueryList = _this14.getQueryList.bind(_this14);
-    _this14.getTopPosition = _this14.getTopPosition.bind(_this14);
-    return _this14;
+    _this16.getBibtex = _this16.getBibtex.bind(_this16);
+    _this16.getQueryList = _this16.getQueryList.bind(_this16);
+    _this16.getTopPosition = _this16.getTopPosition.bind(_this16);
+    return _this16;
   }
 
   /**
@@ -1207,7 +1338,7 @@ var QueryDetailBox = function (_React$Component13) {
           { className: 'scrollable' },
           React.createElement(
             'button',
-            { className: 'pure-button', onClick: this.props.close },
+            { className: 'pure-button spaced-button', onClick: this.props.close },
             'X'
           ),
           React.createElement(
@@ -1274,17 +1405,17 @@ var QueryDetailBox = function (_React$Component13) {
  */
 
 
-var QueriesBox = function (_React$Component14) {
-  _inherits(QueriesBox, _React$Component14);
+var QueriesBox = function (_React$Component15) {
+  _inherits(QueriesBox, _React$Component15);
 
   function QueriesBox(props) {
     _classCallCheck(this, QueriesBox);
 
-    var _this15 = _possibleConstructorReturn(this, (QueriesBox.__proto__ || Object.getPrototypeOf(QueriesBox)).call(this, props));
+    var _this17 = _possibleConstructorReturn(this, (QueriesBox.__proto__ || Object.getPrototypeOf(QueriesBox)).call(this, props));
 
-    _this15.serviceMethod = "FindQueries";
-    _this15.tableHeader = ['Request', 'Acceded resource', 'UUID'];
-    _this15.tableHeaderMapping = { 'Request': {
+    _this17.serviceMethod = "FindQueries";
+    _this17.tableHeader = ['Request', 'Acceded resource', 'UUID'];
+    _this17.tableHeaderMapping = { 'Request': {
         field: 'parameters',
         type: tableCellFactory.cellTypes.query },
       'Acceded resource': {
@@ -1295,7 +1426,7 @@ var QueriesBox = function (_React$Component14) {
         type: tableCellFactory.cellTypes.uuid }
     };
 
-    _this15.state = { queries: [],
+    _this17.state = { queries: [],
       parameters: {},
       rightComponent: null,
       visibleNodes: [],
@@ -1304,13 +1435,13 @@ var QueriesBox = function (_React$Component14) {
       allNodesData: []
     };
 
-    _this15.toggled = _this15.toggled.bind(_this15);
-    _this15.toggleAll = _this15.toggleAll.bind(_this15);
-    _this15.fillDisplayedData = _this15.fillDisplayedData.bind(_this15);
-    _this15.setRightComponent = _this15.setRightComponent.bind(_this15);
-    _this15.getQueryParameters = _this15.getQueryParameters.bind(_this15);
-    _this15.queryApiForQueries = _this15.queryApiForQueries.bind(_this15);
-    return _this15;
+    _this17.toggled = _this17.toggled.bind(_this17);
+    _this17.toggleAll = _this17.toggleAll.bind(_this17);
+    _this17.fillDisplayedData = _this17.fillDisplayedData.bind(_this17);
+    _this17.setRightComponent = _this17.setRightComponent.bind(_this17);
+    _this17.getQueryParameters = _this17.getQueryParameters.bind(_this17);
+    _this17.queryApiForQueries = _this17.queryApiForQueries.bind(_this17);
+    return _this17;
   }
 
   /**
@@ -1578,18 +1709,18 @@ function CreditsBox(props) {
  * @param serviceApi url of service returning the list of queries
  */
 
-var MainComponent = function (_React$Component15) {
-  _inherits(MainComponent, _React$Component15);
+var MainComponent = function (_React$Component16) {
+  _inherits(MainComponent, _React$Component16);
 
   function MainComponent(props) {
     _classCallCheck(this, MainComponent);
 
-    var _this16 = _possibleConstructorReturn(this, (MainComponent.__proto__ || Object.getPrototypeOf(MainComponent)).call(this, props));
+    var _this18 = _possibleConstructorReturn(this, (MainComponent.__proto__ || Object.getPrototypeOf(MainComponent)).call(this, props));
 
-    _this16.defaultSelection = "Home";
-    _this16.state = { selectedBox: _this16.defaultSelection };
-    _this16.getSections = _this16.getSections.bind(_this16);
-    return _this16;
+    _this18.defaultSelection = "Home";
+    _this18.state = { selectedBox: _this18.defaultSelection };
+    _this18.getSections = _this18.getSections.bind(_this18);
+    return _this18;
   }
 
   /**

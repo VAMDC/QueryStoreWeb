@@ -142,19 +142,6 @@ class PureMenuElement extends React.Component{
 class ReactTableElement extends React.Component{
   constructor(props){
     super(props);
-    this.getDisplayedData = this.getDisplayedData.bind(this);
-  }
-  
-  /**
-   * returns a list of values to diplay in a tr element : [{value:"", type:""}]
-   */
-  getDisplayedData(data_row){
-    var self = this;
-    var result = [];
-    for (var column in self.props.tableKeys){
-      result.push({ 'value':data_row[self.props.tableKeys[column].field], 'type':self.props.tableKeys[column].type});
-    }
-    return result;
   }
 
   componentDidMount() {
@@ -169,21 +156,132 @@ class ReactTableElement extends React.Component{
     return (
     <div id="data-table">
       <p>{this.props.title}</p>
-      <table id="data-table-content" className={className}>
+      <PaginatedTable class={this.props.class} tableHeader={this.props.tableHeader} rows={this.props.tableContent} lineFilter={this.props.lineFilter} tableKeys={this.props.tableKeys}/>
+
+    </div>
+    );
+  }
+}
+
+class PaginatedTable extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      currentPage: 1,
+      todosPerPage: 15
+    };
+    this.handleClick = this.handleClick.bind(this);
+    this.getDisplayedData = this.getDisplayedData.bind(this);
+    this.previousPage = this.previousPage.bind(this);
+    this.nextPage = this.nextPage.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(nextProps.rows.legnth !== this.props.rows.length){
+      this.setState({currentPage : 1});
+    }
+  }
+
+  handleClick(event) {
+    this.setState({
+      currentPage: Number(event.target.id)
+    });
+  }
+
+  previousPage(){
+    if(this.state.currentPage > 1){
+      this.setState({currentPage : this.state.currentPage-1});
+    }
+  }
+
+  nextPage(pageNumbers){
+    console.log("next page");
+    console.log(pageNumbers);
+    if(this.state.currentPage < pageNumbers){
+      console.log("in condition");
+      this.setState({currentPage : this.state.currentPage+1});
+    }
+  }
+
+  /**
+   * returns a list of values to diplay in a tr element : [{value:"", type:""}]
+   */
+  getDisplayedData(data_row){
+    var self = this;
+    var result = [];
+    for (var column in self.props.tableKeys){
+      result.push({ 'value':data_row[self.props.tableKeys[column].field], 'type':self.props.tableKeys[column].type});
+    }
+    return result;
+  }
+
+  render() {
+    var self = this;
+    const { currentPage, todosPerPage } = this.state;
+    var todos = this.props.rows.reduce((accumulator, row) =>{
+      if (self.props.lineFilter(row) === true){        
+        accumulator.push(row);
+      }
+      return accumulator;
+    }, []);
+
+    // Logic for displaying todos
+    const indexOfLastTodo = currentPage * todosPerPage;
+    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+    const currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
+
+    const renderTodos = currentTodos.map((todo, i) => {
+        //displays only get requests   
+        return <TableContentRowElement content={this.getDisplayedData(todo)} key={i}/>
+      });
+
+    // Logic for displaying page numbers
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(todos.length / todosPerPage); i++) {
+      pageNumbers.push(i);
+    }
+
+    const renderPageNumbers = pageNumbers.map(number => {
+      return (      
+        <button 
+          key={number}
+          id={number}
+          onClick={this.handleClick}
+        >
+          {number}
+        </button>
+      );
+    });
+    var className = "pure-table "+this.props.class;
+    var pageString = pageNumbers.length > 0 ? this.state.currentPage+"/"+pageNumbers.length : "";
+
+
+    return (
+    <table id="data-table-content" className={className}>
         <thead>
           <TableHeaderRowElement content={this.props.tableHeader} />
         </thead>
-        <tbody>
-          {
-            this.props.tableContent.map(function(data_row, i){
-              //displays only get requests
-              if(self.props.lineFilter(data_row))            
-                return <TableContentRowElement content={self.getDisplayedData(data_row)} key={i} handleClick={self.props.lineFilter}/>
-            })
-          }
-        </tbody>
-      </table>
-    </div>
+      <tbody>        
+        {renderTodos}        
+      </tbody>
+      <tfoot id="page-numbers">
+        <tr>
+          <td colSpan={this.props.tableHeader.length}>
+          <button  className="pure-button spaced-button"
+            onClick={this.previousPage}
+          >
+            &lt;
+          </button>
+          <span>{pageString}</span>
+          <button className="pure-button spaced-button"
+            onClick={()=>{this.nextPage(pageNumbers.length);}}
+          >
+            &gt;
+          </button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
     );
   }
 }
@@ -482,7 +580,7 @@ class PureButtonComponent extends React.Component{
   render(){
     return(
       <div>
-        <button className="pure-button" type="button" onClick={this.handleClick}>{this.props.label}</button>
+        <button className="pure-button spaced-button" type="button" onClick={this.handleClick}>{this.props.label}</button>
       </div>
     );
   }
@@ -581,7 +679,7 @@ class HiddableDiv extends React.Component{
     return (
       <div className="hiddable-div">
         <p>
-          <button onClick={this.switchVisibility}>
+          <button onClick={this.switchVisibility} className="pure-button spaced-button">
             {this.state.buttonText} {this.props.contentName}
           </button>
         </p>
@@ -718,8 +816,8 @@ class CheckBoxesList extends React.Component{
     if(this.props.values.length > 0){
       title = this.props.title;
       buttons = <p>
-                  <button onClick={this.selectAllBoxes}>Select all</button>
-                  <button onClick={this.deselectAllBoxes}>Unselect all</button>      
+                  <button onClick={this.selectAllBoxes} className="pure-button spaced-button">Select all</button>
+                  <button onClick={this.deselectAllBoxes} className="pure-button spaced-button">Unselect all</button>      
                 </p>
     }
     return (
@@ -837,7 +935,7 @@ class QueryDetailBox extends React.Component{
     return (
       <div className="references" style={style}>
         <div className="scrollable">
-          <button className="pure-button" onClick={this.props.close}>X</button>
+          <button className="pure-button spaced-button" onClick={this.props.close}>X</button>
           <div>
             <p>
               <strong>Request UUID </strong> : {this.props.uuid}

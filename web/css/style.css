@@ -20,7 +20,8 @@ body h2{
 }
 
 .first-level{
-  margin-left : 1em;
+  margin-left : 0.1em;
+  margin-right : 0.1em;
 }
 
 .references{
@@ -62,6 +63,11 @@ body h2{
 
 .underline{
   text-decoration: underline;
+}
+
+.spaced-button{
+  margin-left : 0.1em;
+  margin-right : 0.1em;
 }
 
 #data-table table{
