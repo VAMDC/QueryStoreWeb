@@ -139,36 +139,12 @@ class PureMenuElement extends React.Component{
  * @param lineFilter    line hidden if lineFilter(line) is false
  *  
  */
-class ReactTableElement extends React.Component{
-  constructor(props){
-    super(props);
-  }
-
-  componentDidMount() {
-    var newTableObject = document.getElementById("data-table-content");
-    sorttable.makeSortable(newTableObject);
-  }
-  
-  render(){
-    var self = this;
-    var className = "pure-table "+this.props.class;
-
-    return (
-    <div id="data-table">
-      <p>{this.props.title}</p>
-      <PaginatedTable class={this.props.class} tableHeader={this.props.tableHeader} rows={this.props.tableContent} lineFilter={this.props.lineFilter} tableKeys={this.props.tableKeys}/>
-
-    </div>
-    );
-  }
-}
-
 class PaginatedTable extends React.Component {
   constructor() {
     super();
     this.state = {
       currentPage: 1,
-      todosPerPage: 15
+      rowsPerPage: 15
     };
     this.handleClick = this.handleClick.bind(this);
     this.getDisplayedData = this.getDisplayedData.bind(this);
@@ -176,8 +152,13 @@ class PaginatedTable extends React.Component {
     this.nextPage = this.nextPage.bind(this);
   }
 
+  componentDidMount() {
+    var newTableObject = document.getElementById("data-table-content");
+    sorttable.makeSortable(newTableObject);
+  }
+
   componentWillReceiveProps(nextProps){
-    if(nextProps.rows.legnth !== this.props.rows.length){
+    if(nextProps.tableContent.legnth !== this.props.tableContent.length){
       this.setState({currentPage : 1});
     }
   }
@@ -195,10 +176,7 @@ class PaginatedTable extends React.Component {
   }
 
   nextPage(pageNumbers){
-    console.log("next page");
-    console.log(pageNumbers);
     if(this.state.currentPage < pageNumbers){
-      console.log("in condition");
       this.setState({currentPage : this.state.currentPage+1});
     }
   }
@@ -217,27 +195,27 @@ class PaginatedTable extends React.Component {
 
   render() {
     var self = this;
-    const { currentPage, todosPerPage } = this.state;
-    var todos = this.props.rows.reduce((accumulator, row) =>{
+    const { currentPage, rowsPerPage } = this.state;
+    var rows = this.props.tableContent.reduce((accumulator, row) =>{
       if (self.props.lineFilter(row) === true){        
         accumulator.push(row);
       }
       return accumulator;
     }, []);
 
-    // Logic for displaying todos
-    const indexOfLastTodo = currentPage * todosPerPage;
-    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-    const currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
+    // Logic for displaying rows
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRows = rows.slice(indexOfFirstRow, indexOfLastRow);
 
-    const renderTodos = currentTodos.map((todo, i) => {
+    const renderRows = currentRows.map((todo, i) => {
         //displays only get requests   
         return <TableContentRowElement content={this.getDisplayedData(todo)} key={i}/>
       });
 
     // Logic for displaying page numbers
     const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(todos.length / todosPerPage); i++) {
+    for (let i = 1; i <= Math.ceil(rows.length / rowsPerPage); i++) {
       pageNumbers.push(i);
     }
 
@@ -252,36 +230,38 @@ class PaginatedTable extends React.Component {
         </button>
       );
     });
-    var className = "pure-table "+this.props.class;
+
     var pageString = pageNumbers.length > 0 ? this.state.currentPage+"/"+pageNumbers.length : "";
 
-
     return (
-    <table id="data-table-content" className={className}>
-        <thead>
-          <TableHeaderRowElement content={this.props.tableHeader} />
-        </thead>
-      <tbody>        
-        {renderTodos}        
-      </tbody>
-      <tfoot id="page-numbers">
-        <tr>
-          <td colSpan={this.props.tableHeader.length}>
-          <button  className="pure-button spaced-button"
-            onClick={this.previousPage}
-          >
-            &lt;
-          </button>
-          <span>{pageString}</span>
-          <button className="pure-button spaced-button"
-            onClick={()=>{this.nextPage(pageNumbers.length);}}
-          >
-            &gt;
-          </button>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+    <div id="data-table">
+      <p>{this.props.title}</p>
+      <table id="data-table-content" className="pure-table ">
+          <thead>
+            <TableHeaderRowElement content={this.props.tableHeader} />
+          </thead>
+        <tbody>        
+          {renderRows}        
+        </tbody>
+        <tfoot id="page-numbers">
+          <tr>
+            <td colSpan={this.props.tableHeader.length}>
+            <button  className="pure-button spaced-button"
+              onClick={this.previousPage}
+            >
+              &lt;
+            </button>
+            <span>{pageString}</span>
+            <button className="pure-button spaced-button"
+              onClick={()=>{this.nextPage(pageNumbers.length);}}
+            >
+              &gt;
+            </button>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
     );
   }
 }
@@ -377,9 +357,6 @@ class TableCellSelectableTextElement extends React.Component{
 * @param content   displayed content
 */
 class TableCellQueryElement extends React.Component{
-
-
-
   constructor(props){
     super(props);
     this.fullText = null;
@@ -1064,7 +1041,7 @@ class QueriesBox extends React.Component{
   setRightComponent(){
     var right_component;
     if(StoreUtilities.isEmptyTable(this.state.queries) == false)
-      right_component =   <ReactTableElement  tableHeader={this.tableHeader}
+      right_component =   <PaginatedTable  tableHeader={this.tableHeader}
                           tableKeys={this.tableHeaderMapping}
                           tableContent={this.state.allNodesData }
                           title=''

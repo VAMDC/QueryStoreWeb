@@ -187,66 +187,35 @@ var PureMenuElement = function (_React$Component2) {
  */
 
 
-var ReactTableElement = function (_React$Component3) {
-  _inherits(ReactTableElement, _React$Component3);
+var PaginatedTable = function (_React$Component3) {
+  _inherits(PaginatedTable, _React$Component3);
 
-  function ReactTableElement(props) {
-    _classCallCheck(this, ReactTableElement);
+  function PaginatedTable() {
+    _classCallCheck(this, PaginatedTable);
 
-    return _possibleConstructorReturn(this, (ReactTableElement.__proto__ || Object.getPrototypeOf(ReactTableElement)).call(this, props));
+    var _this3 = _possibleConstructorReturn(this, (PaginatedTable.__proto__ || Object.getPrototypeOf(PaginatedTable)).call(this));
+
+    _this3.state = {
+      currentPage: 1,
+      rowsPerPage: 15
+    };
+    _this3.handleClick = _this3.handleClick.bind(_this3);
+    _this3.getDisplayedData = _this3.getDisplayedData.bind(_this3);
+    _this3.previousPage = _this3.previousPage.bind(_this3);
+    _this3.nextPage = _this3.nextPage.bind(_this3);
+    return _this3;
   }
 
-  _createClass(ReactTableElement, [{
+  _createClass(PaginatedTable, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       var newTableObject = document.getElementById("data-table-content");
       sorttable.makeSortable(newTableObject);
     }
   }, {
-    key: 'render',
-    value: function render() {
-      var self = this;
-      var className = "pure-table " + this.props.class;
-
-      return React.createElement(
-        'div',
-        { id: 'data-table' },
-        React.createElement(
-          'p',
-          null,
-          this.props.title
-        ),
-        React.createElement(PaginatedTable, { 'class': this.props.class, tableHeader: this.props.tableHeader, rows: this.props.tableContent, lineFilter: this.props.lineFilter, tableKeys: this.props.tableKeys })
-      );
-    }
-  }]);
-
-  return ReactTableElement;
-}(React.Component);
-
-var PaginatedTable = function (_React$Component4) {
-  _inherits(PaginatedTable, _React$Component4);
-
-  function PaginatedTable() {
-    _classCallCheck(this, PaginatedTable);
-
-    var _this4 = _possibleConstructorReturn(this, (PaginatedTable.__proto__ || Object.getPrototypeOf(PaginatedTable)).call(this));
-
-    _this4.state = {
-      currentPage: 1,
-      todosPerPage: 15
-    };
-    _this4.handleClick = _this4.handleClick.bind(_this4);
-    _this4.getDisplayedData = _this4.getDisplayedData.bind(_this4);
-    _this4.previousPage = _this4.previousPage.bind(_this4);
-    _this4.nextPage = _this4.nextPage.bind(_this4);
-    return _this4;
-  }
-
-  _createClass(PaginatedTable, [{
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
-      if (nextProps.rows.legnth !== this.props.rows.length) {
+      if (nextProps.tableContent.legnth !== this.props.tableContent.length) {
         this.setState({ currentPage: 1 });
       }
     }
@@ -267,10 +236,7 @@ var PaginatedTable = function (_React$Component4) {
   }, {
     key: 'nextPage',
     value: function nextPage(pageNumbers) {
-      console.log("next page");
-      console.log(pageNumbers);
       if (this.state.currentPage < pageNumbers) {
-        console.log("in condition");
         this.setState({ currentPage: this.state.currentPage + 1 });
       }
     }
@@ -292,33 +258,33 @@ var PaginatedTable = function (_React$Component4) {
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this4 = this;
 
       var self = this;
       var _state = this.state,
           currentPage = _state.currentPage,
-          todosPerPage = _state.todosPerPage;
+          rowsPerPage = _state.rowsPerPage;
 
-      var todos = this.props.rows.reduce(function (accumulator, row) {
+      var rows = this.props.tableContent.reduce(function (accumulator, row) {
         if (self.props.lineFilter(row) === true) {
           accumulator.push(row);
         }
         return accumulator;
       }, []);
 
-      // Logic for displaying todos
-      var indexOfLastTodo = currentPage * todosPerPage;
-      var indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-      var currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
+      // Logic for displaying rows
+      var indexOfLastRow = currentPage * rowsPerPage;
+      var indexOfFirstRow = indexOfLastRow - rowsPerPage;
+      var currentRows = rows.slice(indexOfFirstRow, indexOfLastRow);
 
-      var renderTodos = currentTodos.map(function (todo, i) {
+      var renderRows = currentRows.map(function (todo, i) {
         //displays only get requests   
-        return React.createElement(TableContentRowElement, { content: _this5.getDisplayedData(todo), key: i });
+        return React.createElement(TableContentRowElement, { content: _this4.getDisplayedData(todo), key: i });
       });
 
       // Logic for displaying page numbers
       var pageNumbers = [];
-      for (var i = 1; i <= Math.ceil(todos.length / todosPerPage); i++) {
+      for (var i = 1; i <= Math.ceil(rows.length / rowsPerPage); i++) {
         pageNumbers.push(i);
       }
 
@@ -328,56 +294,65 @@ var PaginatedTable = function (_React$Component4) {
           {
             key: number,
             id: number,
-            onClick: _this5.handleClick
+            onClick: _this4.handleClick
           },
           number
         );
       });
-      var className = "pure-table " + this.props.class;
+
       var pageString = pageNumbers.length > 0 ? this.state.currentPage + "/" + pageNumbers.length : "";
 
       return React.createElement(
-        'table',
-        { id: 'data-table-content', className: className },
+        'div',
+        { id: 'data-table' },
         React.createElement(
-          'thead',
+          'p',
           null,
-          React.createElement(TableHeaderRowElement, { content: this.props.tableHeader })
+          this.props.title
         ),
         React.createElement(
-          'tbody',
-          null,
-          renderTodos
-        ),
-        React.createElement(
-          'tfoot',
-          { id: 'page-numbers' },
+          'table',
+          { id: 'data-table-content', className: 'pure-table ' },
           React.createElement(
-            'tr',
+            'thead',
             null,
+            React.createElement(TableHeaderRowElement, { content: this.props.tableHeader })
+          ),
+          React.createElement(
+            'tbody',
+            null,
+            renderRows
+          ),
+          React.createElement(
+            'tfoot',
+            { id: 'page-numbers' },
             React.createElement(
-              'td',
-              { colSpan: this.props.tableHeader.length },
+              'tr',
+              null,
               React.createElement(
-                'button',
-                { className: 'pure-button spaced-button',
-                  onClick: this.previousPage
-                },
-                '<'
-              ),
-              React.createElement(
-                'span',
-                null,
-                pageString
-              ),
-              React.createElement(
-                'button',
-                { className: 'pure-button spaced-button',
-                  onClick: function onClick() {
-                    _this5.nextPage(pageNumbers.length);
-                  }
-                },
-                '>'
+                'td',
+                { colSpan: this.props.tableHeader.length },
+                React.createElement(
+                  'button',
+                  { className: 'pure-button spaced-button',
+                    onClick: this.previousPage
+                  },
+                  '<'
+                ),
+                React.createElement(
+                  'span',
+                  null,
+                  pageString
+                ),
+                React.createElement(
+                  'button',
+                  { className: 'pure-button spaced-button',
+                    onClick: function onClick() {
+                      _this4.nextPage(pageNumbers.length);
+                    }
+                  },
+                  '>'
+                )
               )
             )
           )
@@ -459,16 +434,16 @@ function TableCellTextElement(props) {
 * @param handleClick    function called when link is clicked
 */
 
-var TableCellSelectableTextElement = function (_React$Component5) {
-  _inherits(TableCellSelectableTextElement, _React$Component5);
+var TableCellSelectableTextElement = function (_React$Component4) {
+  _inherits(TableCellSelectableTextElement, _React$Component4);
 
   function TableCellSelectableTextElement(props) {
     _classCallCheck(this, TableCellSelectableTextElement);
 
-    var _this6 = _possibleConstructorReturn(this, (TableCellSelectableTextElement.__proto__ || Object.getPrototypeOf(TableCellSelectableTextElement)).call(this, props));
+    var _this5 = _possibleConstructorReturn(this, (TableCellSelectableTextElement.__proto__ || Object.getPrototypeOf(TableCellSelectableTextElement)).call(this, props));
 
-    _this6.handleClick = _this6.handleClick.bind(_this6);
-    return _this6;
+    _this5.handleClick = _this5.handleClick.bind(_this5);
+    return _this5;
   }
 
   _createClass(TableCellSelectableTextElement, [{
@@ -501,21 +476,21 @@ var TableCellSelectableTextElement = function (_React$Component5) {
 * @param content   displayed content
 */
 
-var TableCellQueryElement = function (_React$Component6) {
-  _inherits(TableCellQueryElement, _React$Component6);
+var TableCellQueryElement = function (_React$Component5) {
+  _inherits(TableCellQueryElement, _React$Component5);
 
   function TableCellQueryElement(props) {
     _classCallCheck(this, TableCellQueryElement);
 
-    var _this7 = _possibleConstructorReturn(this, (TableCellQueryElement.__proto__ || Object.getPrototypeOf(TableCellQueryElement)).call(this, props));
+    var _this6 = _possibleConstructorReturn(this, (TableCellQueryElement.__proto__ || Object.getPrototypeOf(TableCellQueryElement)).call(this, props));
 
-    _this7.fullText = null;
-    _this7.shortText = null;
-    _this7.state = {
-      displayedText: _this7.getDisplayedText(_this7.props.content.replace("query=", "").replace(";", ""))
+    _this6.fullText = null;
+    _this6.shortText = null;
+    _this6.state = {
+      displayedText: _this6.getDisplayedText(_this6.props.content.replace("query=", "").replace(";", ""))
     };
-    _this7.getDisplayedText = _this7.getDisplayedText.bind(_this7);
-    return _this7;
+    _this6.getDisplayedText = _this6.getDisplayedText.bind(_this6);
+    return _this6;
   }
 
   _createClass(TableCellQueryElement, [{
@@ -528,17 +503,17 @@ var TableCellQueryElement = function (_React$Component6) {
   }, {
     key: 'render',
     value: function render() {
-      var _this8 = this;
+      var _this7 = this;
 
       this.fullText = this.props.content.replace("query=", "").replace(";", "");
       this.shortText = this.getDisplayedText(this.fullText);
       return React.createElement(
         'td',
         { onMouseEnter: function onMouseEnter() {
-            _this8.setState({ displayedText: _this8.fullText });
+            _this7.setState({ displayedText: _this7.fullText });
           },
           onMouseLeave: function onMouseLeave() {
-            _this8.setState({ displayedText: _this8.shortText });
+            _this7.setState({ displayedText: _this7.shortText });
           }
         },
         this.state.displayedText
@@ -636,17 +611,17 @@ function ExternalLinkElement(props) {
  * @param onChange action performed when content is changed
  */
 
-var InputDateComponent = function (_React$Component7) {
-  _inherits(InputDateComponent, _React$Component7);
+var InputDateComponent = function (_React$Component6) {
+  _inherits(InputDateComponent, _React$Component6);
 
   function InputDateComponent(props) {
     _classCallCheck(this, InputDateComponent);
 
-    var _this9 = _possibleConstructorReturn(this, (InputDateComponent.__proto__ || Object.getPrototypeOf(InputDateComponent)).call(this, props));
+    var _this8 = _possibleConstructorReturn(this, (InputDateComponent.__proto__ || Object.getPrototypeOf(InputDateComponent)).call(this, props));
 
-    _this9.state = { value: '' };
-    _this9.change = _this9.change.bind(_this9);
-    return _this9;
+    _this8.state = { value: '' };
+    _this8.change = _this8.change.bind(_this8);
+    return _this8;
   }
 
   _createClass(InputDateComponent, [{
@@ -694,17 +669,17 @@ var InputDateComponent = function (_React$Component7) {
  */
 
 
-var InputNumberComponent = function (_React$Component8) {
-  _inherits(InputNumberComponent, _React$Component8);
+var InputNumberComponent = function (_React$Component7) {
+  _inherits(InputNumberComponent, _React$Component7);
 
   function InputNumberComponent(props) {
     _classCallCheck(this, InputNumberComponent);
 
-    var _this10 = _possibleConstructorReturn(this, (InputNumberComponent.__proto__ || Object.getPrototypeOf(InputNumberComponent)).call(this, props));
+    var _this9 = _possibleConstructorReturn(this, (InputNumberComponent.__proto__ || Object.getPrototypeOf(InputNumberComponent)).call(this, props));
 
-    _this10.state = { value: '', inputClass: true };
-    _this10.handleChange = _this10.handleChange.bind(_this10);
-    return _this10;
+    _this9.state = { value: '', inputClass: true };
+    _this9.handleChange = _this9.handleChange.bind(_this9);
+    return _this9;
   }
 
   _createClass(InputNumberComponent, [{
@@ -746,16 +721,16 @@ var InputNumberComponent = function (_React$Component8) {
  */
 
 
-var PureButtonComponent = function (_React$Component9) {
-  _inherits(PureButtonComponent, _React$Component9);
+var PureButtonComponent = function (_React$Component8) {
+  _inherits(PureButtonComponent, _React$Component8);
 
   function PureButtonComponent(props) {
     _classCallCheck(this, PureButtonComponent);
 
-    var _this11 = _possibleConstructorReturn(this, (PureButtonComponent.__proto__ || Object.getPrototypeOf(PureButtonComponent)).call(this, props));
+    var _this10 = _possibleConstructorReturn(this, (PureButtonComponent.__proto__ || Object.getPrototypeOf(PureButtonComponent)).call(this, props));
 
-    _this11.handleClick = _this11.handleClick.bind(_this11);
-    return _this11;
+    _this10.handleClick = _this10.handleClick.bind(_this10);
+    return _this10;
   }
 
   _createClass(PureButtonComponent, [{
@@ -823,18 +798,18 @@ function PureGridTwoColumnsBox(props) {
  *
  */
 
-var QueriesFormBox = function (_React$Component10) {
-  _inherits(QueriesFormBox, _React$Component10);
+var QueriesFormBox = function (_React$Component9) {
+  _inherits(QueriesFormBox, _React$Component9);
 
   function QueriesFormBox(props) {
     _classCallCheck(this, QueriesFormBox);
 
-    var _this12 = _possibleConstructorReturn(this, (QueriesFormBox.__proto__ || Object.getPrototypeOf(QueriesFormBox)).call(this, props));
+    var _this11 = _possibleConstructorReturn(this, (QueriesFormBox.__proto__ || Object.getPrototypeOf(QueriesFormBox)).call(this, props));
 
-    _this12.state = {
+    _this11.state = {
       concepts: []
     };
-    return _this12;
+    return _this11;
   }
 
   /**
@@ -881,20 +856,20 @@ var QueriesFormBox = function (_React$Component10) {
  */
 
 
-var HiddableDiv = function (_React$Component11) {
-  _inherits(HiddableDiv, _React$Component11);
+var HiddableDiv = function (_React$Component10) {
+  _inherits(HiddableDiv, _React$Component10);
 
   function HiddableDiv(props) {
     _classCallCheck(this, HiddableDiv);
 
-    var _this13 = _possibleConstructorReturn(this, (HiddableDiv.__proto__ || Object.getPrototypeOf(HiddableDiv)).call(this, props));
+    var _this12 = _possibleConstructorReturn(this, (HiddableDiv.__proto__ || Object.getPrototypeOf(HiddableDiv)).call(this, props));
 
-    _this13.state = {
+    _this12.state = {
       visibilityClass: "hidden",
       buttonText: "Show"
     };
-    _this13.switchVisibility = _this13.switchVisibility.bind(_this13);
-    return _this13;
+    _this12.switchVisibility = _this12.switchVisibility.bind(_this12);
+    return _this12;
   }
 
   _createClass(HiddableDiv, [{
@@ -945,8 +920,8 @@ var HiddableDiv = function (_React$Component11) {
  */
 
 
-var CheckBox = function (_React$Component12) {
-  _inherits(CheckBox, _React$Component12);
+var CheckBox = function (_React$Component11) {
+  _inherits(CheckBox, _React$Component11);
 
   function CheckBox(props) {
     _classCallCheck(this, CheckBox);
@@ -976,15 +951,15 @@ var CheckBox = function (_React$Component12) {
  */
 
 
-var CheckBoxesList = function (_React$Component13) {
-  _inherits(CheckBoxesList, _React$Component13);
+var CheckBoxesList = function (_React$Component12) {
+  _inherits(CheckBoxesList, _React$Component12);
 
   function CheckBoxesList(props) {
     _classCallCheck(this, CheckBoxesList);
 
-    var _this15 = _possibleConstructorReturn(this, (CheckBoxesList.__proto__ || Object.getPrototypeOf(CheckBoxesList)).call(this, props));
+    var _this14 = _possibleConstructorReturn(this, (CheckBoxesList.__proto__ || Object.getPrototypeOf(CheckBoxesList)).call(this, props));
 
-    _this15.state = {
+    _this14.state = {
       //to be displayed as checkboxes
       boxes: [],
       //dictionary resource_name : boolean
@@ -992,11 +967,11 @@ var CheckBoxesList = function (_React$Component13) {
       boxesStatus: {}
     };
 
-    _this15.onCheckBoxChange = _this15.onCheckBoxChange.bind(_this15);
-    _this15.selectAllBoxes = _this15.selectAllBoxes.bind(_this15);
-    _this15.deselectAllBoxes = _this15.deselectAllBoxes.bind(_this15);
-    _this15.switchAllBoxes = _this15.switchAllBoxes.bind(_this15);
-    return _this15;
+    _this14.onCheckBoxChange = _this14.onCheckBoxChange.bind(_this14);
+    _this14.selectAllBoxes = _this14.selectAllBoxes.bind(_this14);
+    _this14.deselectAllBoxes = _this14.deselectAllBoxes.bind(_this14);
+    _this14.switchAllBoxes = _this14.switchAllBoxes.bind(_this14);
+    return _this14;
   }
 
   _createClass(CheckBoxesList, [{
@@ -1141,22 +1116,22 @@ var CheckBoxesList = function (_React$Component13) {
  */
 
 
-var QueryDetailBox = function (_React$Component14) {
-  _inherits(QueryDetailBox, _React$Component14);
+var QueryDetailBox = function (_React$Component13) {
+  _inherits(QueryDetailBox, _React$Component13);
 
   function QueryDetailBox(props) {
     _classCallCheck(this, QueryDetailBox);
 
-    var _this16 = _possibleConstructorReturn(this, (QueryDetailBox.__proto__ || Object.getPrototypeOf(QueryDetailBox)).call(this, props));
+    var _this15 = _possibleConstructorReturn(this, (QueryDetailBox.__proto__ || Object.getPrototypeOf(QueryDetailBox)).call(this, props));
 
-    _this16.state = {
+    _this15.state = {
       positionX: 0,
       positionY: 0
     };
-    _this16.getBibtex = _this16.getBibtex.bind(_this16);
-    _this16.getQueryList = _this16.getQueryList.bind(_this16);
-    _this16.getTopPosition = _this16.getTopPosition.bind(_this16);
-    return _this16;
+    _this15.getBibtex = _this15.getBibtex.bind(_this15);
+    _this15.getQueryList = _this15.getQueryList.bind(_this15);
+    _this15.getTopPosition = _this15.getTopPosition.bind(_this15);
+    return _this15;
   }
 
   /**
@@ -1405,17 +1380,17 @@ var QueryDetailBox = function (_React$Component14) {
  */
 
 
-var QueriesBox = function (_React$Component15) {
-  _inherits(QueriesBox, _React$Component15);
+var QueriesBox = function (_React$Component14) {
+  _inherits(QueriesBox, _React$Component14);
 
   function QueriesBox(props) {
     _classCallCheck(this, QueriesBox);
 
-    var _this17 = _possibleConstructorReturn(this, (QueriesBox.__proto__ || Object.getPrototypeOf(QueriesBox)).call(this, props));
+    var _this16 = _possibleConstructorReturn(this, (QueriesBox.__proto__ || Object.getPrototypeOf(QueriesBox)).call(this, props));
 
-    _this17.serviceMethod = "FindQueries";
-    _this17.tableHeader = ['Request', 'Acceded resource', 'UUID'];
-    _this17.tableHeaderMapping = { 'Request': {
+    _this16.serviceMethod = "FindQueries";
+    _this16.tableHeader = ['Request', 'Acceded resource', 'UUID'];
+    _this16.tableHeaderMapping = { 'Request': {
         field: 'parameters',
         type: tableCellFactory.cellTypes.query },
       'Acceded resource': {
@@ -1426,7 +1401,7 @@ var QueriesBox = function (_React$Component15) {
         type: tableCellFactory.cellTypes.uuid }
     };
 
-    _this17.state = { queries: [],
+    _this16.state = { queries: [],
       parameters: {},
       rightComponent: null,
       visibleNodes: [],
@@ -1435,13 +1410,13 @@ var QueriesBox = function (_React$Component15) {
       allNodesData: []
     };
 
-    _this17.toggled = _this17.toggled.bind(_this17);
-    _this17.toggleAll = _this17.toggleAll.bind(_this17);
-    _this17.fillDisplayedData = _this17.fillDisplayedData.bind(_this17);
-    _this17.setRightComponent = _this17.setRightComponent.bind(_this17);
-    _this17.getQueryParameters = _this17.getQueryParameters.bind(_this17);
-    _this17.queryApiForQueries = _this17.queryApiForQueries.bind(_this17);
-    return _this17;
+    _this16.toggled = _this16.toggled.bind(_this16);
+    _this16.toggleAll = _this16.toggleAll.bind(_this16);
+    _this16.fillDisplayedData = _this16.fillDisplayedData.bind(_this16);
+    _this16.setRightComponent = _this16.setRightComponent.bind(_this16);
+    _this16.getQueryParameters = _this16.getQueryParameters.bind(_this16);
+    _this16.queryApiForQueries = _this16.queryApiForQueries.bind(_this16);
+    return _this16;
   }
 
   /**
@@ -1521,7 +1496,7 @@ var QueriesBox = function (_React$Component15) {
     key: 'setRightComponent',
     value: function setRightComponent() {
       var right_component;
-      if (StoreUtilities.isEmptyTable(this.state.queries) == false) right_component = React.createElement(ReactTableElement, { tableHeader: this.tableHeader,
+      if (StoreUtilities.isEmptyTable(this.state.queries) == false) right_component = React.createElement(PaginatedTable, { tableHeader: this.tableHeader,
         tableKeys: this.tableHeaderMapping,
         tableContent: this.state.allNodesData,
         title: '',
@@ -1709,18 +1684,18 @@ function CreditsBox(props) {
  * @param serviceApi url of service returning the list of queries
  */
 
-var MainComponent = function (_React$Component16) {
-  _inherits(MainComponent, _React$Component16);
+var MainComponent = function (_React$Component15) {
+  _inherits(MainComponent, _React$Component15);
 
   function MainComponent(props) {
     _classCallCheck(this, MainComponent);
 
-    var _this18 = _possibleConstructorReturn(this, (MainComponent.__proto__ || Object.getPrototypeOf(MainComponent)).call(this, props));
+    var _this17 = _possibleConstructorReturn(this, (MainComponent.__proto__ || Object.getPrototypeOf(MainComponent)).call(this, props));
 
-    _this18.defaultSelection = "Home";
-    _this18.state = { selectedBox: _this18.defaultSelection };
-    _this18.getSections = _this18.getSections.bind(_this18);
-    return _this18;
+    _this17.defaultSelection = "Home";
+    _this17.state = { selectedBox: _this17.defaultSelection };
+    _this17.getSections = _this17.getSections.bind(_this17);
+    return _this17;
   }
 
   /**
