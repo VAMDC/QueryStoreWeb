@@ -77,7 +77,12 @@ var StoreUtilities = (function(){
           'http://stark-b.obspm.fr/12.07/vamdc/tap/' :  { 'name' : 'Stark-b' },
           'http://tipbase.obspm.fr/12.07/vamdc/tap/' : { 'name' : 'TIPbase : VAMDC-TAP interface' },
           'http://topbase.obspm.fr/12.07/vamdc/tap/' :  { 'name' : 'TOPbase : VAMDC-TAP interface' },
-          'http://basecol2015.vamdc.org/12_07/' : { 'name' : 'Basecol 2015 (dev)' }
+          'http://basecol2015.vamdc.org/12_07/' : { 'name' : 'Basecol 2015 (dev)' },
+          'http://vamdc.icb.cnrs.fr/mecasda-12.07/tap/' : { 'name' : 'MeCaSDa - Methane Calculated Spectroscopic Database' },
+          'http://vamdc.icb.cnrs.fr/tfmecasda/tap/' : { 'name' : 'TFMeCaSDa - CF4 Calculated Spectroscopic Database' },
+          'http://vamdc.icb.cnrs.fr/shecasda/tap/' : { 'name' : '	SHeCaSDa - SF6 Calculated Spectroscopic Database' },
+          'http://vamdc.icb.cnrs.fr/gecasda/tap/' : { 'name' : 'GeCaSDa: Gemane Calculated Spectroscopic Database' },
+          'http://vamdc.icb.cnrs.fr/rucasda/tap/' : { 'name' : 'RuCaSDa: Ruthenium tetroxide Calculated Spectroscopic Database' },
       };
 
       self.getLocalRegistry = function(){
