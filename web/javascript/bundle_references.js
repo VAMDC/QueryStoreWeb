@@ -36237,7 +36237,8 @@ var QueryDetailBox = React.createClass({
       var i = 1;
 
       for (var k in bibtex) {
-        if (StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available" && StoreUtilities.getPropertyInObject("JOURNAL", bibtex[k]) !== "not available") {
+        if (StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available") {
+
           result.push(React.createElement(
             'ul',
             { key: i },
@@ -36306,11 +36307,53 @@ var QueryDetailBox = React.createClass({
               ),
               ' : ',
               StoreUtilities.getPropertyInObject("YEAR", bibtex[k])
+            ),
+            React.createElement(
+              'li',
+              null,
+              React.createElement(
+                'span',
+                { className: 'underline' },
+                'Reference name in bibtex'
+              ),
+              ' : ',
+              k
             )
           ));
           i++;
           result.push(React.createElement('hr', { key: i }));
           i++;
+        } else {
+          if (StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k]) !== 'N.N.') {
+            result.push(React.createElement(
+              'ul',
+              { key: i },
+              React.createElement(
+                'li',
+                null,
+                React.createElement(
+                  'span',
+                  { className: 'underline' },
+                  'Reference name in bibtex'
+                ),
+                ' : ',
+                k
+              ),
+              React.createElement(
+                'li',
+                null,
+                React.createElement(
+                  'span',
+                  { className: 'underline' },
+                  'Error'
+                ),
+                ': title is missing, please check bibtex source code to get more information.'
+              )
+            ));
+            i++;
+            result.push(React.createElement('hr', { key: i }));
+            i++;
+          }
         }
       }
       //title of references area

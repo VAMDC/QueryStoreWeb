@@ -140,10 +140,10 @@ var QueryDetailBox = React.createClass({
     try{
       var bibtex = parse(this.props.reference.bibtex);
       var i = 1;
-
+      
       for (var k in bibtex) {
-        if( StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available" &&
-            StoreUtilities.getPropertyInObject("JOURNAL", bibtex[k]) !== "not available"){
+        if( StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available"){
+          
           result.push(
             <ul key={i}>
                 <li><span className="underline">Title</span> : {StoreUtilities.getPropertyInObject("TITLE", bibtex[k])}</li>
@@ -152,10 +152,21 @@ var QueryDetailBox = React.createClass({
                 <li><span className="underline">Pages</span> : {StoreUtilities.getPropertyInObject("PAGES", bibtex[k])}</li>
                 <li><span className="underline">Volume</span> : {StoreUtilities.getPropertyInObject("VOLUME", bibtex[k])}</li>
                 <li><span className="underline">Year</span> : {StoreUtilities.getPropertyInObject("YEAR", bibtex[k])}</li>
+                <li><span className="underline">Reference name in bibtex</span> : {k}</li>
             </ul>)
           i++;
           result.push(<hr key={i}/>)
           i++;
+        }else{
+          if(StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k]) !== 'N.N.'){
+            result.push(<ul key={i}>
+              <li><span className="underline">Reference name in bibtex</span> : {k}</li>
+              <li><span className="underline">Error</span>: title is missing, please check bibtex source code to get more information.</li>
+              </ul>)
+            i++;
+            result.push(<hr key={i}/>)
+            i++;
+          }
         }
       }
       //title of references area
