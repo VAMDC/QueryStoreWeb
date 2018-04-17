@@ -36067,6 +36067,7 @@ function get_reference(data) {
   reference.bibtex = data['biblioGraphicReferences'] !== undefined ? data['biblioGraphicReferences'] : '';
   reference.xsams = data["dataURL"] !== undefined ? data['dataURL'] : '';
   reference.uuid = data['UUID'] !== undefined ? data['UUID'] : '';
+  reference.doi = data['DOI'] !== null ? data['DOI'] : 'Not available';
   reference.query = data['parameters'] !== undefined ? data['parameters'][0].replace('query=', '').replace(';', '') : '';
   reference.timestamps = data["queryInvocationDetails"] !== undefined ? data['queryInvocationDetails'] : '';
   reference.outputformatversion = data['outputFormatVersion'] !== undefined ? data['outputFormatVersion'] : '';
@@ -36498,6 +36499,35 @@ var QueryDetailBox = React.createClass({
             ),
             ' : ',
             this.props.reference.uuid
+          ),
+          React.createElement(
+            'p',
+            null,
+            this.props.reference.doi !== "Not available" ? React.createElement(
+              'span',
+              null,
+              React.createElement(
+                'strong',
+                null,
+                'Request DOI '
+              ),
+              ' : ',
+              React.createElement(
+                'a',
+                { href: '{this.props.reference.doi}' },
+                this.props.reference.doi
+              )
+            ) : React.createElement(
+              'span',
+              null,
+              React.createElement(
+                'strong',
+                null,
+                'Request DOI '
+              ),
+              ' : ',
+              this.props.reference.doi
+            )
           )
         ),
         React.createElement(

@@ -154,7 +154,8 @@ class PaginatedTable extends React.Component {
 
   componentDidMount() {
     var newTableObject = document.getElementById("data-table-content");
-    sorttable.makeSortable(newTableObject);
+    //sort function of columns in table is deactivated for now
+    //sorttable.makeSortable(newTableObject);
   }
 
   componentWillReceiveProps(nextProps){
@@ -187,7 +188,7 @@ class PaginatedTable extends React.Component {
   getDisplayedData(data_row){
     var self = this;
     var result = [];
-    for (var column in self.props.tableKeys){
+    for (var column in self.props.tableKeys){      
       result.push({ 'value':data_row[self.props.tableKeys[column].field], 'type':self.props.tableKeys[column].type});
     }
     return result;
@@ -414,12 +415,23 @@ function TableCellTimestampsElement(props){
 };
 
 /**
+ * td element displaying a timestamp
+ * @param content   list of strings
+ */
+function TableCellTimestampElement(props){
+  return (
+    <td>{StoreUtilities.timestampToDate(props.content)}</td>
+   );
+};
+
+/**
  * returns a td element according to data type
  */
 var tableCellFactory = {
 
   cellTypes : {
     timestamps : "timestamps",
+    timestamp : "timestamp",
     text : "text",
     url : "url",
     query : "query",
@@ -432,6 +444,8 @@ var tableCellFactory = {
   getCell : function(cell){
     if(cell.type === this.cellTypes.url)
       return <TableCellUrlElement content={cell.value} key={cell.key}/>
+    else if(cell.type === this.cellTypes.timestamp)
+      return <TableCellTimestampElement content={cell.value} key={cell.key}/>
     else if(cell.type === this.cellTypes.timestamps)
       return <TableCellTimestampsElement content={cell.value} key={cell.key}/>
     else if(cell.type === this.cellTypes.query)
@@ -948,13 +962,16 @@ class QueriesBox extends React.Component{
   constructor(props){
     super(props);
     this.serviceMethod = "FindQueries";
-    this.tableHeader = ['Request', 'Acceded resource', 'UUID'];
+    this.tableHeader = ['Request', 'Acceded resource', 'Last execution','UUID'];
     this.tableHeaderMapping = {  'Request': {
                             field:'parameters',
                             type: tableCellFactory.cellTypes.query},
                           'Acceded resource':{
                               field:'resourceName',
                               type : tableCellFactory.cellTypes.text},
+                          'Last execution':{
+                              field:'lastExecutionTimestamp',
+                              type : tableCellFactory.cellTypes.timestamp},
                           'UUID': {
                             field : 'UUID',
                             type : tableCellFactory.cellTypes.uuid},
@@ -1029,6 +1046,8 @@ class QueriesBox extends React.Component{
         displayed.push(query);    
       }
     }
+
+    displayed.sort((a, b)=>{return b.lastExecutionTimestamp - a.lastExecutionTimestamp});
 
     this.setState({allNodesData : displayed}, function(){
       this.setRightComponent();

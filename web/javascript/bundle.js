@@ -210,7 +210,8 @@ var PaginatedTable = function (_React$Component3) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       var newTableObject = document.getElementById("data-table-content");
-      sorttable.makeSortable(newTableObject);
+      //sort function of columns in table is deactivated for now
+      //sorttable.makeSortable(newTableObject);
     }
   }, {
     key: 'componentWillReceiveProps',
@@ -567,12 +568,25 @@ function TableCellTimestampsElement(props) {
 };
 
 /**
+ * td element displaying a timestamp
+ * @param content   list of strings
+ */
+function TableCellTimestampElement(props) {
+  return React.createElement(
+    'td',
+    null,
+    StoreUtilities.timestampToDate(props.content)
+  );
+};
+
+/**
  * returns a td element according to data type
  */
 var tableCellFactory = {
 
   cellTypes: {
     timestamps: "timestamps",
+    timestamp: "timestamp",
     text: "text",
     url: "url",
     query: "query",
@@ -583,7 +597,7 @@ var tableCellFactory = {
   *  @param cell    a cell type
   */
   getCell: function getCell(cell) {
-    if (cell.type === this.cellTypes.url) return React.createElement(TableCellUrlElement, { content: cell.value, key: cell.key });else if (cell.type === this.cellTypes.timestamps) return React.createElement(TableCellTimestampsElement, { content: cell.value, key: cell.key });else if (cell.type === this.cellTypes.query) return React.createElement(TableCellQueryElement, { content: cell.value.join(', '), key: cell.key });else if (cell.type === this.cellTypes.uuid) {
+    if (cell.type === this.cellTypes.url) return React.createElement(TableCellUrlElement, { content: cell.value, key: cell.key });else if (cell.type === this.cellTypes.timestamp) return React.createElement(TableCellTimestampElement, { content: cell.value, key: cell.key });else if (cell.type === this.cellTypes.timestamps) return React.createElement(TableCellTimestampsElement, { content: cell.value, key: cell.key });else if (cell.type === this.cellTypes.query) return React.createElement(TableCellQueryElement, { content: cell.value.join(', '), key: cell.key });else if (cell.type === this.cellTypes.uuid) {
       return React.createElement(TableCellUrlElement, { text: cell.value, href: SITE_URL + 'references.html?uuid=' + cell.value, key: cell.key });
     } else return React.createElement(TableCellTextElement, { content: cell.value, key: cell.key });
   }
@@ -1389,13 +1403,16 @@ var QueriesBox = function (_React$Component14) {
     var _this16 = _possibleConstructorReturn(this, (QueriesBox.__proto__ || Object.getPrototypeOf(QueriesBox)).call(this, props));
 
     _this16.serviceMethod = "FindQueries";
-    _this16.tableHeader = ['Request', 'Acceded resource', 'UUID'];
+    _this16.tableHeader = ['Request', 'Acceded resource', 'Last execution', 'UUID'];
     _this16.tableHeaderMapping = { 'Request': {
         field: 'parameters',
         type: tableCellFactory.cellTypes.query },
       'Acceded resource': {
         field: 'resourceName',
         type: tableCellFactory.cellTypes.text },
+      'Last execution': {
+        field: 'lastExecutionTimestamp',
+        type: tableCellFactory.cellTypes.timestamp },
       'UUID': {
         field: 'UUID',
         type: tableCellFactory.cellTypes.uuid }
@@ -1482,6 +1499,10 @@ var QueriesBox = function (_React$Component14) {
           displayed.push(query);
         }
       }
+
+      displayed.sort(function (a, b) {
+        return b.lastExecutionTimestamp - a.lastExecutionTimestamp;
+      });
 
       this.setState({ allNodesData: displayed }, function () {
         this.setRightComponent();
