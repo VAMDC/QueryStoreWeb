@@ -36447,6 +36447,10 @@ var QueryDetailBox = React.createClass({
       'Request result downloaded on (UTC+1) :'
     ) : "";
     var width = Math.round($(".references").width());
+
+    var doi = null;
+    if (this.props.reference.doi !== "Not available") doi = this.props.reference.doi;
+
     return React.createElement(
       'div',
       { className: this.getVisibility() },
@@ -36456,6 +36460,19 @@ var QueryDetailBox = React.createClass({
         React.createElement(
           'div',
           null,
+          React.createElement(
+            'p',
+            null,
+            doi !== null && React.createElement(
+              'span',
+              null,
+              React.createElement(
+                'a',
+                { href: "https://doi.org/" + doi },
+                React.createElement('img', { src: "https://zenodo.org/badge/DOI/" + doi + ".svg", alt: 'DOI' })
+              )
+            )
+          ),
           React.createElement(
             'p',
             null,
@@ -36499,35 +36516,6 @@ var QueryDetailBox = React.createClass({
             ),
             ' : ',
             this.props.reference.uuid
-          ),
-          React.createElement(
-            'p',
-            null,
-            this.props.reference.doi !== "Not available" ? React.createElement(
-              'span',
-              null,
-              React.createElement(
-                'strong',
-                null,
-                'Request DOI '
-              ),
-              ' : ',
-              React.createElement(
-                'a',
-                { href: '{this.props.reference.doi}' },
-                this.props.reference.doi
-              )
-            ) : React.createElement(
-              'span',
-              null,
-              React.createElement(
-                'strong',
-                null,
-                'Request DOI '
-              ),
-              ' : ',
-              this.props.reference.doi
-            )
           )
         ),
         React.createElement(

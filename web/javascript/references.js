@@ -240,10 +240,21 @@ var QueryDetailBox = React.createClass({
 
     var timestamp_title = timestamps.length > 0 ? <strong>Request result downloaded on (UTC+1) :</strong> : "";
     var width = Math.round($(".references").width());
+    
+    var doi = null;
+    if (this.props.reference.doi !== "Not available" )
+      doi = this.props.reference.doi;
+    
     return (
       <div className={this.getVisibility()}>
         <div>         
           <div>
+            <p>
+              { doi !== null &&
+              (            
+                <span><a href={"https://doi.org/"+doi}><img src={"https://zenodo.org/badge/DOI/"+doi+".svg"} alt="DOI"/></a></span>
+              )}
+            </p>
             <p>
               <strong>Data source </strong> : {this.props.reference.datasource}
             </p>
@@ -255,13 +266,6 @@ var QueryDetailBox = React.createClass({
             </p>
             <p>
               <strong>Request UUID </strong> : {this.props.reference.uuid}
-            </p>
-            <p>
-              { this.props.reference.doi !== "Not available" ? (
-              <span><strong>Request DOI </strong> : <a href="{this.props.reference.doi}">{this.props.reference.doi}</a></span>
-              ) :
-              (<span><strong>Request DOI </strong> : {this.props.reference.doi}</span>)
-              }
             </p>
           </div>
           <div>
