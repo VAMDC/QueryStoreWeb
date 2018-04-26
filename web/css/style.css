@@ -19,6 +19,13 @@ body h2{
   float : none;
 }
 
+.scrollable-div{
+  max-height : 300px;
+  overflow-y : auto;
+  margin-bottom : 1.5em;
+  margin-right : 1em;
+}
+
 .first-level{
   margin-left : 0.1em;
   margin-right : 0.1em;

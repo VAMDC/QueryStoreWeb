@@ -1,10 +1,9 @@
 // main.js
 var React = require('react');
 var ReactDOM = require('react-dom');
-var $ = require("jquery");
-var classNames = require('classnames');
-var moment = require('moment');
-var Datetime = require('react-datetime');
+//~ var classNames = require('classnames');
+//~ var moment = require('moment');
+//~ var Datetime = require('react-datetime');
 var parse = require("bibtex-parser");
 
 /**
@@ -58,23 +57,26 @@ function MessageBox(props){
  * @param content        div content
  * @param contentName    content name in button text
  */
-var HiddableDiv = React.createClass({
-  getInitialState : function() {
-    return {
+class HiddableDiv extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {
       visibilityClass : "hidden",
       buttonText : "Show",
     };
-  },
+    this.switchVisibility = this.switchVisibility.bind(this);
+  } 
 
-  switchVisibility : function(){
+  switchVisibility(){
     if(this.state.visibilityClass === "hidden"){
       this.setState({visibilityClass : "visible", buttonText:"Hide"})
     }else{
       this.setState({visibilityClass : "hidden", buttonText:"Show"})
     }
-  },
+  }
 
-  render : function(){
+  render(){
     return (
       <div className="hiddable-div">
         <p>
@@ -88,24 +90,26 @@ var HiddableDiv = React.createClass({
       </div>
     );
   }
-
-});
+}
 
 /**
  * @param error     contain reference data of a request
  *
  */
-var QueryErrorBox = React.createClass({ 
+class QueryErrorBox extends React.Component{
 
-  getVisibility : function(){    
+  constructor(props){
+    super(props);
+  }
+
+  getVisibility(){    
     if(this.props.error.uuid === ''){
       return "hidden";
-    }  
-    
+    }      
     return "visible";
-  },
+  }
   
-  render : function(){  
+  render(){  
     return (
       <div className={this.getVisibility()}>        
         <div>
@@ -125,23 +129,38 @@ var QueryErrorBox = React.createClass({
       </div>
     );    
   }
-});
+}
 
 /**
  * @param reference     contain reference data of a request
  *
  */
-var QueryDetailBox = React.createClass({
+class QueryDetailBox extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {
+      referenceVisibility : "visible",
+      bibtexVisibility : "hidden",
+      bibRefSwitchText : "Bibtex"
+    };
+
+    this.getBibtex = this.getBibtex.bind(this);
+    this.getQueryList = this.getQueryList.bind(this);
+    //~ this.getTopPosition = this.getTopPosition.bind(this);
+    this.getVisibility = this.getVisibility.bind(this);
+    this.switchReferences = this.switchReferences.bind(this);
+    
+  }
 
  /**
  *  Return html formatted bibtex
  */
-  getBibtex : function(){
+  getBibtex(){
     var result = [];
     try{
       var bibtex = parse(this.props.reference.bibtex);
       var i = 1;
-      
       for (var k in bibtex) {
         if( StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available"){
           
@@ -170,27 +189,22 @@ var QueryDetailBox = React.createClass({
           }
         }
       }
-      //title of references area
-      if(result.length > 0){
-        result.unshift(<strong key="0">References :</strong>);
-      } else {
-        if(bibtex !== '' && result.length === 0){
-          result.push(<strong key="0">No reference</strong>);
-        }
-      }
+      //no reference found
+      if(bibtex !== '' && result.length === 0){
+        result.push(<strong key="0">No reference</strong>);
+      }    
     }catch(e){
       console.log(e);
       result.push(<p key="bibtex-error">Error : Invalid bibtex content</p>)
     }
-
     return result;
-  },
+  }
 
 /**
 * Return an ordered list of query date formatted in html 
 */
 
-  getQueryList : function(){
+  getQueryList(){
     var result = [];
     if(this.props.reference !== null){
       var timestamps = this.props.reference.timestamps;      
@@ -209,37 +223,53 @@ var QueryDetailBox = React.createClass({
       }
     }
     return result;
-  },
+  }
 
   /**
   * Return value of top css property for the div
   * @param suggestedtop  value suggested from the cursor position
   */
-  getTopPosition : function(suggestedtop){
-    var top = suggestedtop;
-    var height = Math.round($(".references").height());
-    var excess = document.body.clientHeight - ( top + height );
-    if( excess < 0 ){
-      top = top + excess;
-    }
-    return top;
-  },
+  //~ getTopPosition(suggestedtop){
+    //~ var top = suggestedtop;
+    //~ var height = Math.round($(".references").height());
+    //~ var excess = document.body.clientHeight - ( top + height );
+    //~ if( excess < 0 ){
+      //~ top = top + excess;
+    //~ }
+    //~ return top;
+  //~ }
   
-  getVisibility : function(){    
+  getVisibility(){    
     if(this.props.reference.uuid === ''){
       return "hidden";
     }      
     return "visible";
-  },
+  }
 
-  render : function(){
+  switchReferences(){
+    if(this.state.bibRefSwitchText === "Bibtex"){
+      this.setState({
+        referenceVisibility : "hidden",
+        bibtexVisibility : "visible",
+        bibRefSwitchText : "References"
+      });
+    }else{
+      this.setState({
+        referenceVisibility : "visible",
+        bibtexVisibility : "hidden",
+        bibRefSwitchText : "Bibtex"
+      });
+    }
+  }
+  
+  render(){
 
     var references = this.getBibtex();
     var bibtex_src = this.props.reference.bibtex ;
     var timestamps = this.getQueryList();
 
     var timestamp_title = timestamps.length > 0 ? <strong>Request result downloaded on (UTC+1) :</strong> : "";
-    var width = Math.round($(".references").width());
+    //~ var width = Math.round($(".references").width());
     
     var doi = null;
     if (this.props.reference.doi !== "Not available" )
@@ -249,12 +279,7 @@ var QueryDetailBox = React.createClass({
       <div className={this.getVisibility()}>
         <div>         
           <div>
-            <p>
-              { doi !== null &&
-              (            
-                <span><a href={"https://doi.org/"+doi}><img src={"https://zenodo.org/badge/DOI/"+doi+".svg"} alt="DOI"/></a></span>
-              )}
-            </p>
+            <DoiSubmitComponent doi={doi} uuid={this.props.reference.uuid}/>
             <p>
               <strong>Data source </strong> : {this.props.reference.datasource}
             </p>
@@ -274,23 +299,78 @@ var QueryDetailBox = React.createClass({
             </p>
             <p>
               <strong>XSAMS version</strong> : {this.props.reference.outputformatversion}
-            </p>
+            </p>          
           </div>
-          <div>
-            {references}
-          </div>
-          <HiddableDiv content={bibtex_src} contentName="bibtex code" />
-          <div>
+          <div className="scrollable-div">
             {timestamp_title}
             <ul>
               {timestamps}
             </ul>
           </div>
+          <div>            
+            <div className={"scrollable-div " + this.state.referenceVisibility}>
+              <p><strong>References</strong></p>
+              <div>
+                {references}
+              </div>
+            </div>
+          </div>
+          <div>            
+            <div className={"scrollable-div " + this.state.bibtexVisibility}>
+              <p><strong>Bibtex</strong></p>
+              <div>
+                {bibtex_src}
+              </div>
+            </div>
+          </div>
+          <div>
+            <button onClick={this.switchReferences}><strong>{"Switch to "+ this.state.bibRefSwitchText}</strong></button>
+          </div>
         </div>
       </div>
     );
   }
-});
+}
+
+/**
+ * @doi
+ * @uuid
+ */
+class DoiSubmitComponent extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.askForDoi = this.askForDoi.bind(this);
+  }
+
+  askForDoi(){
+    var xhr = StoreUtilities.getXhrWithCors("GET", SUBMIT_FOR_DOI_URL+this.props.uuid);
+    xhr.send();
+    xhr.addEventListener('readystatechange', function() {
+      if(xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.status === 200) {
+          location.reload();   
+        } else {
+          alert("Unable to get a DOI for this request.");
+        }
+      }
+    });    
+  }
+  
+
+  render(){
+    console.log(this.props.doi);
+    return(
+    <div>
+      { this.props.doi !== null ?
+      (            
+        <span><a href={"https://doi.org/"+this.props.doi} target="_blank"><img src={"https://zenodo.org/badge/DOI/"+this.props.doi+".svg"} alt="DOI"/></a></span>
+      ):
+      ( <span><button onClick={this.askForDoi}>Get a DOI</button></span>)}
+    </div>);
+  }
+
+}
 
 
 /**
@@ -298,61 +378,57 @@ var QueryDetailBox = React.createClass({
  * @param serviceApi  url of service returning the list of queries
  * @param queryId     request uuid
  */
-var MainComponent = React.createClass({
+class MainComponent extends React.Component{
 
-  queryUrl : 'InfoQuery',
-
-  getInitialState: function() {
-    return {
-            component : null
-    };
-  },
+  constructor(props){
+    super(props);
+    this.state = { component : null };
+    this.queryUrl='InfoQuery';
+    this.queryApiForReferences = this.queryApiForReferences.bind(this);
+  
+  }
 
   /**
    * sends a request to the service to get the references linked to a query
    */
-  queryApiForReferences : function(){
+  queryApiForReferences(){
     var self = this;
-    var jqxhr = $.ajax( this.props.serviceApi+self.queryUrl+"?uuid="+this.props.queryId )
-      .done(function(data, textStatus, jqXHR) {
-        //request has been correctly processed
-        if(jqXHR.status === 200){
+    var xhr = StoreUtilities.getXhrWithCors("GET", this.props.serviceApi+self.queryUrl+"?uuid="+this.props.queryId);
+    var uuid = encodeURIComponent(this.props.queryId);
+    xhr.send();
+    xhr.addEventListener('readystatechange', function() {
+
+      if(xhr.readyState === XMLHttpRequest.DONE){
+        if (xhr.status === 200) {
+          var data = JSON.parse(xhr.responseText);
           if(data["queryInformation"] !== undefined){
             var reference = get_reference(data["queryInformation"]);
             self.setState({
               component : <QueryDetailBox reference={reference}/>
             });
-          }
-        // not yet processed or does not exist
-        } else if(jqXHR.status === 204){          
+          } else if(data["queryError"] !== undefined){
+            var error = get_error_info(data["queryError"]);
             self.setState({
-              component : <MessageBox text={"Request not available. Processing a new request take some time, please try again in a couple minutes."}/>
+              component : <QueryErrorBox error={error}/>
             });
-        // error indicated by api when performing search
-        } else if(data["queryError"] !== undefined){
-          var error = get_error_info(data["queryError"]);
+          }
+        } else if(xhr.status === 204){
           self.setState({
-            component : <QueryErrorBox error={error}/>
+            component : <MessageBox text={"Request not available. Processing a new request take some time, please try again in a couple minutes."}/>
           });
-        }
-      })
-      .fail(function( jqXHR, textStatus, errorThrown) {
-        // no http error code, request did not reach the service
-        if(jqXHR.status === 0){
-          var message = "Request could not be completed because of wrong service url.";
-          self.setState({component : <MessageBox text={message}/>});
-        }else{
-          var message = get_error_message(jqXHR.responseText);
+        } else if (xhr.status >= 400){
+          var message = get_error_message(xhr.responseText);
           self.setState({component : <MessageBox text={message}/>});
         }
-      });    
-  },
+      }
+    });   
+  }
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.queryApiForReferences();
-  },
+  }
 
-  render : function() {
+  render() {
     var self = this;
     var component = "";
     
@@ -366,7 +442,7 @@ var MainComponent = React.createClass({
     );
   }
 
-});
+}
 
 ReactDOM.render(
   <MainComponent serviceApi={SERVICE_URL} queryId={StoreUtilities.getUrlParameter("uuid")}/>,

@@ -73,6 +73,8 @@ var StoreUtilities = (function(){
       var self = {};
       var local_registry = {
           'http://dev.vamdc.org/basecol/tapservice_12_07/' : { 'name' : 'BASECOL: VAMDC-TAP interface', 'ivo_id': 'ivo://vamdc/basecol/vamdc-tap_12.07' },
+          'http://basecoltap2015.vamdc.org/12_07/' : { 'name' : 'BASECOL2015: VAMDC-TAP interface', 'ivo_id': 'ivo://vamdc/basecol2015/vamdc-tap' },
+          'http://basecol2015.vamdc.org/12_07/' : { 'name' : 'BASECOL2015: VAMDC-TAP interface (old url)', 'ivo_id': 'ivo://vamdc/basecol2015/vamdc-tap'},
           'http://servo.aob.rs/emol/tap' : {'name' : 'Belgrade electron/atom(molecule) database (BEAMDB)', 'ivo_id': 'ivo://vamdc/emol_radam'},
           'http://lts.iao.ru/node/cdsd-1000-xsams1/tap/' : {'name' : 'Carbon Dioxide Spectroscopic Databank 1000K (VAMDC-TAP)', 'ivo_id': 'ivo://vamdc/cdsd-1000'},
           'http://lts.iao.ru/node/cdsd-296-xsams1/tap/' : {'name' : 'Carbon Dioxide Spectroscopic Databank 296K (VAMDC-TAP)', 'ivo_id': 'ivo://vamdc/cdsd-296'},
@@ -134,7 +136,25 @@ var StoreUtilities = (function(){
                 return sParameterName[1] === undefined ? true : sParameterName[1];
             }
         }
+    },
+
+    getXhrWithCors : function(method, url){
+      var xhr = null;
+      //Test pour savoir si l'objet XHR gère withCredentials, ce qui indique qu'il s'agit bien de la version 2 de XHR
+      if (window.XDomainRequest){
+        xhr = new XDomainRequest();
+        xhr.open(method, url, true);
+      }
+      //Sinon on teste l'objet XDomainRequest pour Internet Explorer
+      else if (window.XMLHttpRequest){
+        xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+      }
+        
+      return xhr;
     }
+
+    
   };
 })();
 
