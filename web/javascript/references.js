@@ -120,10 +120,10 @@ class QueryErrorBox extends React.Component{
             <strong>Error message </strong> : {this.props.error.errorMessage}
           </p>
           <p>
-            <strong>Request UUID </strong> : {this.props.error.uuid}
+            <strong>Query UUID </strong> : {this.props.error.uuid}
           </p>
           <p>
-            <strong>Request parameters </strong> : {this.props.error.parameters}
+            <strong>Query parameters </strong> : {this.props.error.parameters}
           </p>
         </div>
       </div>
@@ -268,7 +268,7 @@ class QueryDetailBox extends React.Component{
     var bibtex_src = this.props.reference.bibtex ;
     var timestamps = this.getQueryList();
 
-    var timestamp_title = timestamps.length > 0 ? <strong>Request result downloaded on (UTC+1) :</strong> : "";
+    var timestamp_title = timestamps.length > 0 ? <strong>Query result downloaded on (UTC+1) :</strong> : "";
     //~ var width = Math.round($(".references").width());
     
     var doi = null;
@@ -287,15 +287,15 @@ class QueryDetailBox extends React.Component{
               <strong>Data source version </strong> : {this.props.reference.resourceversion}
             </p>
             <p>
-              <strong>Request </strong> : {this.props.reference.query}
+              <strong>Query </strong> : {this.props.reference.query}
             </p>
             <p>
-              <strong>Request UUID </strong> : {this.props.reference.uuid}
+              <strong>Query identifier </strong> : {this.props.reference.uuid}
             </p>
           </div>
           <div>
             <p>
-              <strong>Request result</strong> : <a href={this.props.reference.xsams}>XSAMS file</a>
+              <strong>Query result</strong> : <a href={this.props.reference.xsams}>XSAMS file</a>
             </p>
             <p>
               <strong>XSAMS version</strong> : {this.props.reference.outputformatversion}
@@ -366,7 +366,7 @@ class DoiSubmitComponent extends React.Component{
       (            
         <span><a href={"https://doi.org/"+this.props.doi} target="_blank"><img src={"https://zenodo.org/badge/DOI/"+this.props.doi+".svg"} alt="DOI"/></a></span>
       ):
-      ( <span><button onClick={this.askForDoi}>Get a DOI</button></span>)}
+      ( <span><button className="pure-button pure-button-primary" onClick={this.askForDoi}>Get a DOI</button></span>)}
     </div>);
   }
 

@@ -20567,7 +20567,7 @@ var QueryErrorBox = function (_React$Component2) {
             React.createElement(
               'strong',
               null,
-              'Request UUID '
+              'Query UUID '
             ),
             ' : ',
             this.props.error.uuid
@@ -20578,7 +20578,7 @@ var QueryErrorBox = function (_React$Component2) {
             React.createElement(
               'strong',
               null,
-              'Request parameters '
+              'Query parameters '
             ),
             ' : ',
             this.props.error.parameters
@@ -20852,7 +20852,7 @@ var QueryDetailBox = function (_React$Component3) {
       var timestamp_title = timestamps.length > 0 ? React.createElement(
         'strong',
         null,
-        'Request result downloaded on (UTC+1) :'
+        'Query result downloaded on (UTC+1) :'
       ) : "";
       //~ var width = Math.round($(".references").width());
 
@@ -20897,7 +20897,7 @@ var QueryDetailBox = function (_React$Component3) {
               React.createElement(
                 'strong',
                 null,
-                'Request '
+                'Query '
               ),
               ' : ',
               this.props.reference.query
@@ -20908,7 +20908,7 @@ var QueryDetailBox = function (_React$Component3) {
               React.createElement(
                 'strong',
                 null,
-                'Request UUID '
+                'Query identifier '
               ),
               ' : ',
               this.props.reference.uuid
@@ -20923,7 +20923,7 @@ var QueryDetailBox = function (_React$Component3) {
               React.createElement(
                 'strong',
                 null,
-                'Request result'
+                'Query result'
               ),
               ' : ',
               React.createElement(
@@ -21072,7 +21072,7 @@ var DoiSubmitComponent = function (_React$Component4) {
           null,
           React.createElement(
             'button',
-            { onClick: this.askForDoi },
+            { className: 'pure-button pure-button-primary', onClick: this.askForDoi },
             'Get a DOI'
           )
         )
