@@ -101,6 +101,7 @@ var StoreUtilities = (function(){
           'http://vald.astro.uu.se/atoms-12.07/tap/' : { 'name': 'VALD (atoms)', 'ivo_id':'ivo://vamdc/vald/uu/django' },  
           'http://vald.inasan.ru/vald-node/tap/' : { 'name': 'VALD sub-set in Moscow (obs)', 'ivo_id':'ivo://vamdc/vald-Moscow' },
           'http://vamdc.saga.iao.ru/node/wadis/tap/' : { 'name': 'Water internet Accessible Distributed Information System', 'ivo_id':'ivo://vamdc/wadis/vamdc-tap' },      
+          'http://ideadb.uibk.ac.at/tap/' : { 'name': 'IDEADB - Innsbruck Dissociative Electron Attachment Database', 'ivo_id':'ivo://vamdc/IDEADB' },      
       };
 
       self.getLocalRegistry = function(){
