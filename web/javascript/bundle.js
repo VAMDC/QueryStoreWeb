@@ -1563,9 +1563,13 @@ var QueriesBox = function (_React$Component14) {
           // get a list of all nodes 
           for (var i = 0; i < data['Queries'].length; i++) {
             var node_url = data['Queries'][i]['accededResource'];
-            var node_name = StoreUtilities.registry.getNodeName(node_url);
-            if (!nodes_names.includes(node_name)) {
-              nodes_names.push(node_name);
+            try {
+              var node_name = StoreUtilities.registry.getNodeName(node_url);
+              if (!nodes_names.includes(node_name)) {
+                nodes_names.push(node_name);
+              }
+            } catch (error) {
+              console.log(error);
             }
           }
           // sort node names in alphabetical order  

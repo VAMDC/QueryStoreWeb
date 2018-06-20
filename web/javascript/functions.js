@@ -101,15 +101,22 @@ var StoreUtilities = (function(){
           'http://vald.astro.uu.se/atoms-12.07/tap/' : { 'name': 'VALD (atoms)', 'ivo_id':'ivo://vamdc/vald/uu/django' },  
           'http://vald.inasan.ru/vald-node/tap/' : { 'name': 'VALD sub-set in Moscow (obs)', 'ivo_id':'ivo://vamdc/vald-Moscow' },
           'http://vamdc.saga.iao.ru/node/wadis/tap/' : { 'name': 'Water internet Accessible Distributed Information System', 'ivo_id':'ivo://vamdc/wadis/vamdc-tap' },      
-          'http://ideadb.uibk.ac.at/tap/' : { 'name': 'IDEADB - Innsbruck Dissociative Electron Attachment Database', 'ivo_id':'ivo://vamdc/IDEADB' },      
+          'http://ideadb.uibk.ac.at/tap/' : { 'name': 'IDEADB - Innsbruck Dissociative Electron Attachment Database', 'ivo_id':'ivo://vamdc/IDEADB' },
       };
 
       self.getLocalRegistry = function(){
           return local_registry;
       }
-      
+
+      /**
+       * Returns inofs on node at given url
+       * throw exception if not found
+       */
       self.getNodeName = function(node_url){
-        return local_registry[node_url]['name'];
+        if (local_registry[node_url] !== undefined)
+          return local_registry[node_url]['name'];
+        else
+          throw "Node at url "+node_url+" not found in local registry.";
       }
       
       self.getNodeUrl = function(node_name){
