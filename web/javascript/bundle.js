@@ -852,8 +852,8 @@ var QueriesFormBox = function (_React$Component9) {
           React.createElement(
             'fieldset',
             null,
-            React.createElement(InputDateComponent, { name: 'from', label: 'From', onChange: this.props.onChange }),
-            React.createElement(InputDateComponent, { name: 'to', label: 'To', onChange: this.props.onChange }),
+            React.createElement(InputDateComponent, { name: 'from', label: 'Query executed between', onChange: this.props.onChange }),
+            React.createElement(InputDateComponent, { name: 'to', label: 'and', onChange: this.props.onChange }),
             React.createElement(PureButtonComponent, { label: 'Submit', action: this.props.doQuery })
           )
         )

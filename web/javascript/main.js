@@ -633,8 +633,8 @@ class QueriesFormBox extends React.Component{
       <div id="form">
         <form className="pure-form pure-form-stacked">
           <fieldset>
-            <InputDateComponent name="from" label="From" onChange={this.props.onChange}/>
-            <InputDateComponent name="to" label="To" onChange={this.props.onChange}/>
+            <InputDateComponent name="from" label="Query executed between" onChange={this.props.onChange}/>
+            <InputDateComponent name="to" label="and" onChange={this.props.onChange}/>
             <PureButtonComponent label="Submit" action={this.props.doQuery}/>
           </fieldset>
         </form>
