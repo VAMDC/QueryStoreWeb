@@ -962,7 +962,7 @@ class QueriesBox extends React.Component{
   constructor(props){
     super(props);
     this.serviceMethod = "FindQueries";
-    this.tableHeader = ['Request', 'Acceded resource', 'Last execution','UUID'];
+    this.tableHeader = ['Request', 'Accessed resource', 'Last execution','UUID'];
     this.tableHeaderMapping = {  'Request': {
                             field:'parameters',
                             type: tableCellFactory.cellTypes.query},
@@ -1151,7 +1151,7 @@ class QueriesBox extends React.Component{
                           elementId="nodesboxes"
                           toggled={this.toggled}
                           toggleAll={this.toggleAll}
-                          title="Acceded resources"/>
+                          title="Accessed resources"/>
                         </div>;
 
     return(
