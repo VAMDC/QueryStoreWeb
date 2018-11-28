@@ -20954,11 +20954,24 @@ var QueryDetailBox = function (_React$Component3) {
             null,
             React.createElement(
               'div',
-              { className: "scrollable-div " + this.state.referenceVisibility },
+              { className: this.state.referenceVisibility },
+              React.createElement(
+                'p',
+                null,
+                React.createElement(
+                  'strong',
+                  null,
+                  'References'
+                )
+              ),
               React.createElement(
                 'div',
-                null,
-                references
+                { className: 'scrollable-div' },
+                React.createElement(
+                  'div',
+                  null,
+                  references
+                )
               )
             )
           ),
@@ -20967,7 +20980,7 @@ var QueryDetailBox = function (_React$Component3) {
             null,
             React.createElement(
               'div',
-              { className: "scrollable-div " + this.state.bibtexVisibility },
+              { className: this.state.bibtexVisibility },
               React.createElement(
                 'p',
                 null,
@@ -20979,8 +20992,12 @@ var QueryDetailBox = function (_React$Component3) {
               ),
               React.createElement(
                 'div',
-                null,
-                bibtex_src
+                { className: 'scrollable-div' },
+                React.createElement(
+                  'div',
+                  null,
+                  bibtex_src
+                )
               )
             )
           ),

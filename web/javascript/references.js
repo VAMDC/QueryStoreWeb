@@ -299,18 +299,23 @@ class QueryDetailBox extends React.Component{
               {timestamps}
             </ul>
           </div>
-          <div>            
-            <div className={"scrollable-div " + this.state.referenceVisibility}>              
-              <div>
-                {references}
-              </div>
+          <div>
+            <div className={this.state.referenceVisibility}> 
+              <p><strong>References</strong></p>          
+              <div className="scrollable-div">              
+                <div>
+                  {references}
+                </div>
+              </div>            
+             </div>
             </div>
-          </div>
-          <div>            
-            <div className={"scrollable-div " + this.state.bibtexVisibility}>
+          <div>     
+            <div className={this.state.bibtexVisibility}>       
               <p><strong>Bibtex</strong></p>
-              <div>
-                {bibtex_src}
+              <div className="scrollable-div">                
+                <div>
+                  {bibtex_src}
+                </div>
               </div>
             </div>
           </div>
