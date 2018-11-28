@@ -260,9 +260,9 @@ class QueryDetailBox extends React.Component{
     var timestamps = this.getQueryList();
 
     var timestamp_title = timestamps.length > 0 ? <strong>Query result downloaded on (UTC+1) :</strong> : "";
-    //~ var width = Math.round($(".references").width());
-    
+    //~ var width = Math.round($(".references").width());    
     var doi = null;
+
     if (this.props.reference.doi !== "Not available" )
       doi = this.props.reference.doi;
     
@@ -283,13 +283,11 @@ class QueryDetailBox extends React.Component{
             <p>
               <strong>Query identifier </strong> : {this.props.reference.uuid}
             </p>
-            <p>
-              <a href="https://fireblock.io/verify/project/0x20000000000000000000000010683593dd81ac0bcc274c3e4d9fe701c8313596">fireblock</a>
-            </p>
           </div>
           <div>
             <p>
-              <strong>Query result</strong> : <a href={this.props.reference.xsams}>XSAMS file</a>
+              <strong>Query result</strong> : <a href={this.props.reference.xsams}>XSAMS file</a> 
+              (if not available, please try again in a few minutes)
             </p>
             <p>
               <strong>XSAMS version</strong> : {this.props.reference.outputformatversion}
@@ -352,7 +350,6 @@ class DoiSubmitComponent extends React.Component{
   
 
   render(){
-    console.log(this.props.doi);
     return(
     <div>
       { this.props.doi !== null ?

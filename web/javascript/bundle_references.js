@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 // Original work by Henrik Muehe (c) 2010
 //
 // CommonJS port by Mikola Lysenko 2013
@@ -20781,6 +20781,7 @@ var QueryDetailBox = function (_React$Component3) {
       var result = [];
       if (this.props.reference !== null) {
         var timestamps = this.props.reference.timestamps;
+
         // list of displayed timestamps
         var printed_timestamps = [];
         for (var i = 0; i < timestamps.length; i++) {
@@ -20789,7 +20790,11 @@ var QueryDetailBox = function (_React$Component3) {
             printed_timestamps.push(timestamps[i]['timestamp']);
           }
         }
-        printed_timestamps = printed_timestamps.sort();
+
+        // sort timestamps in descending order
+        printed_timestamps = printed_timestamps.sort(function (a, b) {
+          return b - a;
+        });
         for (var i = 0; i < printed_timestamps.length; i++) {
           //timestamps are converted into dates
           result.push(React.createElement(
@@ -20801,21 +20806,6 @@ var QueryDetailBox = function (_React$Component3) {
       }
       return result;
     }
-
-    /**
-    * Return value of top css property for the div
-    * @param suggestedtop  value suggested from the cursor position
-    */
-    //~ getTopPosition(suggestedtop){
-    //~ var top = suggestedtop;
-    //~ var height = Math.round($(".references").height());
-    //~ var excess = document.body.clientHeight - ( top + height );
-    //~ if( excess < 0 ){
-    //~ top = top + excess;
-    //~ }
-    //~ return top;
-    //~ }
-
   }, {
     key: 'getVisibility',
     value: function getVisibility() {
@@ -20854,9 +20844,9 @@ var QueryDetailBox = function (_React$Component3) {
         null,
         'Query result downloaded on (UTC+1) :'
       ) : "";
-      //~ var width = Math.round($(".references").width());
-
+      //~ var width = Math.round($(".references").width());    
       var doi = null;
+
       if (this.props.reference.doi !== "Not available") doi = this.props.reference.doi;
 
       return React.createElement(
@@ -20930,7 +20920,8 @@ var QueryDetailBox = function (_React$Component3) {
                 'a',
                 { href: this.props.reference.xsams },
                 'XSAMS file'
-              )
+              ),
+              '(if not available, please try again in a few minutes)'
             ),
             React.createElement(
               'p',
@@ -20945,9 +20936,13 @@ var QueryDetailBox = function (_React$Component3) {
             )
           ),
           React.createElement(
+            'span',
+            null,
+            timestamp_title
+          ),
+          React.createElement(
             'div',
             { className: 'scrollable-div' },
-            timestamp_title,
             React.createElement(
               'ul',
               null,
@@ -20960,15 +20955,6 @@ var QueryDetailBox = function (_React$Component3) {
             React.createElement(
               'div',
               { className: "scrollable-div " + this.state.referenceVisibility },
-              React.createElement(
-                'p',
-                null,
-                React.createElement(
-                  'strong',
-                  null,
-                  'References'
-                )
-              ),
               React.createElement(
                 'div',
                 null,
@@ -21055,7 +21041,6 @@ var DoiSubmitComponent = function (_React$Component4) {
   }, {
     key: 'render',
     value: function render() {
-      console.log(this.props.doi);
       return React.createElement(
         'div',
         null,
@@ -21172,7 +21157,6 @@ ReactDOM.render(React.createElement(MainComponent, { serviceApi: SERVICE_URL, qu
 
 },{"bibtex-parser":1,"react":182,"react-dom":2}],184:[function(require,module,exports){
 // shim for using process in browser
-
 var process = module.exports = {};
 
 // cached from whatever global is present so that test runners that stub it
@@ -21183,22 +21167,84 @@ var process = module.exports = {};
 var cachedSetTimeout;
 var cachedClearTimeout;
 
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
 (function () {
-  try {
-    cachedSetTimeout = setTimeout;
-  } catch (e) {
-    cachedSetTimeout = function () {
-      throw new Error('setTimeout is not defined');
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
     }
-  }
-  try {
-    cachedClearTimeout = clearTimeout;
-  } catch (e) {
-    cachedClearTimeout = function () {
-      throw new Error('clearTimeout is not defined');
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
     }
-  }
 } ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
 var queue = [];
 var draining = false;
 var currentQueue;
@@ -21223,7 +21269,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = cachedSetTimeout(cleanUpNextTick);
+    var timeout = runTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -21240,7 +21286,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    cachedClearTimeout(timeout);
+    runClearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -21252,7 +21298,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        cachedSetTimeout(drainQueue, 0);
+        runTimeout(drainQueue);
     }
 };
 
@@ -21280,6 +21326,10 @@ process.off = noop;
 process.removeListener = noop;
 process.removeAllListeners = noop;
 process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');

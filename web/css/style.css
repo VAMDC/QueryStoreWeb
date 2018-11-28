@@ -24,6 +24,7 @@ body h2{
   overflow-y : auto;
   margin-bottom : 1.5em;
   margin-right : 1em;
+  margin-top : 1em;
 }
 
 .first-level{
@@ -138,4 +139,21 @@ body h2{
 
 #footer img{
   margin : 0 0.5em 0 0.5em;
+}
+
+.fireblocklink{
+  margin-right : 2em;
+  display : flex;
+}
+
+.fireblocktext{
+  text-align: justify;
+  display : flex;
+}
+
+
+.fireblockalign {
+    padding: 1em 0.5em;
+    text-align: justify;
+    margin: auto;
 }

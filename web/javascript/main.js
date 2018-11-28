@@ -1203,6 +1203,34 @@ function CreditsBox(props){
 };
 
 
+/**
+ * Displays text in a paragraph
+ * @param text
+ */
+function IntegrityBox(props){
+  return (
+    <div className="pure-g">
+      <div className="pure-u-4-12 fireblocklink">
+        <div className="fireblockalign">
+          <a href="https://fireblock.io/verify/project/0x20000000000000000000000010683593dd81ac0bcc274c3e4d9fe701c8313596" target="_blank">
+            <img src="img/fireblock_link.png" width="279px" height="180px" alt="fireblock link"/>
+          </a>
+        </div>
+      </div>
+      <div className="pure-u-7-12 fireblocktext">
+        <div className="fireblockalign">
+          All the file stored on the VAMDC Query Store are certified into an Ethereum blockchain: 
+          for each file we create a certificate by computing the its hash and 
+          by signing it with the VAMDC private key. This certificate is registered into the blockchain.     
+
+          Tnaks to the file verfication link on the left, you can check if a given XSAMS file you have is genuine: 
+          produced by the VAMDC infrastructure and not corrupted or altered since its extraction.  
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 /**
  * Main container
@@ -1223,6 +1251,7 @@ class MainComponent extends React.Component{
   getSections(){
     return {  'Home' : <HomePageBox />,
               'Queries': <QueriesBox serviceApi={this.props.serviceApi}/>,
+              'Integrity check' : <IntegrityBox />,
               'Credits': <CreditsBox />
           };
   }
@@ -1246,6 +1275,8 @@ class MainComponent extends React.Component{
     );
   }
 }
+
+
 
 ReactDOM.render(
   <MainComponent serviceApi={SERVICE_URL} />,
