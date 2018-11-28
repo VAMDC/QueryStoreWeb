@@ -206,8 +206,9 @@ class QueryDetailBox extends React.Component{
 
   getQueryList(){
     var result = [];
-    if(this.props.reference !== null){
+    if(this.props.reference !== null){     
       var timestamps = this.props.reference.timestamps;      
+
       // list of displayed timestamps
       var printed_timestamps = []; 
       for(var i=0; i<timestamps.length; i++){
@@ -216,7 +217,11 @@ class QueryDetailBox extends React.Component{
           printed_timestamps.push(timestamps[i]['timestamp']);
         }
       }
-      printed_timestamps = printed_timestamps.sort();
+
+      // sort timestamps in descending order
+      printed_timestamps = printed_timestamps.sort(function(a, b) {
+        return b - a;
+      });
       for(var i=0; i<printed_timestamps.length; i++){
         //timestamps are converted into dates
         result.push(<li key={i+1}>{StoreUtilities.timestampToDate(printed_timestamps[i])}</li>);
@@ -225,20 +230,6 @@ class QueryDetailBox extends React.Component{
     return result;
   }
 
-  /**
-  * Return value of top css property for the div
-  * @param suggestedtop  value suggested from the cursor position
-  */
-  //~ getTopPosition(suggestedtop){
-    //~ var top = suggestedtop;
-    //~ var height = Math.round($(".references").height());
-    //~ var excess = document.body.clientHeight - ( top + height );
-    //~ if( excess < 0 ){
-      //~ top = top + excess;
-    //~ }
-    //~ return top;
-  //~ }
-  
   getVisibility(){    
     if(this.props.reference.uuid === ''){
       return "hidden";
@@ -292,6 +283,9 @@ class QueryDetailBox extends React.Component{
             <p>
               <strong>Query identifier </strong> : {this.props.reference.uuid}
             </p>
+            <p>
+              <a href="https://fireblock.io/verify/project/0x20000000000000000000000010683593dd81ac0bcc274c3e4d9fe701c8313596">fireblock</a>
+            </p>
           </div>
           <div>
             <p>
@@ -301,15 +295,14 @@ class QueryDetailBox extends React.Component{
               <strong>XSAMS version</strong> : {this.props.reference.outputformatversion}
             </p>          
           </div>
-          <div className="scrollable-div">
-            {timestamp_title}
+          <span>{timestamp_title}</span>
+          <div className="scrollable-div">            
             <ul>
               {timestamps}
             </ul>
           </div>
           <div>            
-            <div className={"scrollable-div " + this.state.referenceVisibility}>
-              <p><strong>References</strong></p>
+            <div className={"scrollable-div " + this.state.referenceVisibility}>              
               <div>
                 {references}
               </div>
