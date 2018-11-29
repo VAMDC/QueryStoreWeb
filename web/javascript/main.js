@@ -1213,7 +1213,7 @@ function IntegrityBox(props){
       <div className="pure-u-4-12 fireblocklink">
         <div className="fireblockalign">
           <a href="https://fireblock.io/verify/project/0x20000000000000000000000010683593dd81ac0bcc274c3e4d9fe701c8313596" target="_blank">
-            <img src="img/fireblock_link_hd.png" width="279px" height="180px" alt="fireblock link"/>
+            <img src="img/fireblock_link.png" width="279px" height="180px" alt="fireblock link"/>
           </a>
         </div>
       </div>
