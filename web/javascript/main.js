@@ -1213,18 +1213,24 @@ function IntegrityBox(props){
       <div className="pure-u-4-12 fireblocklink">
         <div className="fireblockalign">
           <a href="https://fireblock.io/verify/project/0x20000000000000000000000010683593dd81ac0bcc274c3e4d9fe701c8313596" target="_blank">
-            <img src="img/fireblock_link.png" width="279px" height="180px" alt="fireblock link"/>
+            <img src="img/fireblock_link_hd.png" width="279px" height="180px" alt="fireblock link"/>
           </a>
         </div>
       </div>
       <div className="pure-u-7-12 fireblocktext">
         <div className="fireblockalign">
-          All the file stored on the VAMDC Query Store are certified into an Ethereum blockchain: 
-          for each file we create a certificate by computing the its hash and 
-          by signing it with the VAMDC private key. This certificate is registered into the blockchain.     
+          <p>
+            All the files stored on the VAMDC Query Store are certified with Fireblock.io into an Ethereum blockchain. 
+            Each file is time-stamped and signed with VAMDC private key. 
 
-          Tnaks to the file verfication link on the left, you can check if a given XSAMS file you have is genuine: 
-          produced by the VAMDC infrastructure and not corrupted or altered since its extraction.  
+          </p>
+          <p>
+            The file checker on the left allows you to compute locally the hash of your file and verify integrity and genuine origin of 
+            any XSAMS generated on VAMDC infrastructure. 
+          </p>
+          <p>
+            Fireblock.io is open source and free for open source projects.
+          </p>
         </div>
       </div>
     </div>
