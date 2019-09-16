@@ -1178,6 +1178,25 @@ function HomePageBox(props){
 };
 
 /**
+ * Home page
+ */
+function DataPolicy(props){
+  return (
+    <div>
+      <p>
+        See the links below to get informations related to our data management policies.
+      </p>
+      <p>
+        <a href={SITE_URL +"/disclaimer.html"}>VAMDC Disclaimer</a>
+      </p>
+      <p>
+        <a href={SITE_URL +"/privacypolicy.html"}>Privacy policy</a>
+      </p>
+    </div>
+  );
+};
+
+/**
  * Displays text in a paragraph
  */
 function CreditsBox(props){
@@ -1257,8 +1276,8 @@ class MainComponent extends React.Component{
   getSections(){
     return {  'Home' : <HomePageBox />,
               'Queries': <QueriesBox serviceApi={this.props.serviceApi}/>,
-              'Integrity check' : <IntegrityBox />,
-              'Credits': <CreditsBox />
+              'Credits': <CreditsBox />,
+              'Data policy' : <DataPolicy />,
           };
   }
 

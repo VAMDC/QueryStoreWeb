@@ -1649,6 +1649,39 @@ function HomePageBox(props) {
 };
 
 /**
+ * Home page
+ */
+function DataPolicy(props) {
+  return React.createElement(
+    'div',
+    null,
+    React.createElement(
+      'p',
+      null,
+      'See the links below to get informations related to our data management policies.'
+    ),
+    React.createElement(
+      'p',
+      null,
+      React.createElement(
+        'a',
+        { href: SITE_URL + "/disclaimer.html" },
+        'VAMDC Disclaimer'
+      )
+    ),
+    React.createElement(
+      'p',
+      null,
+      React.createElement(
+        'a',
+        { href: SITE_URL + "/privacypolicy.html" },
+        'Privacy policy'
+      )
+    )
+  );
+};
+
+/**
  * Displays text in a paragraph
  */
 function CreditsBox(props) {
@@ -1780,8 +1813,8 @@ var MainComponent = function (_React$Component15) {
     value: function getSections() {
       return { 'Home': React.createElement(HomePageBox, null),
         'Queries': React.createElement(QueriesBox, { serviceApi: this.props.serviceApi }),
-        'Integrity check': React.createElement(IntegrityBox, null),
-        'Credits': React.createElement(CreditsBox, null)
+        'Credits': React.createElement(CreditsBox, null),
+        'Data policy': React.createElement(DataPolicy, null)
       };
     }
   }, {

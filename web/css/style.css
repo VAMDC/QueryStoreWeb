@@ -1,14 +1,23 @@
 body{
+  font: normal 14px/1.7 "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", sans-serif;
   background-color : #E3E7E8;
 }
 
-body h1, h2{
-  font-size : 1.2em;
+body h1, h2, h3, h4, h5, h6{
   font-weight : bold;
 }
 
+body h1{
+  font-size : 1.4em;
+  
+}
+
 body h2{
-  font-size : 1em;
+  font-size : 1.3em;
+}
+
+body h3{
+  font-size : 1.2em;
 }
 
 .hiddable-div{
