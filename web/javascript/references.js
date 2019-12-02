@@ -1,9 +1,6 @@
 // main.js
 var React = require('react');
 var ReactDOM = require('react-dom');
-//~ var classNames = require('classnames');
-//~ var moment = require('moment');
-//~ var Datetime = require('react-datetime');
 var parse = require("bibtex-parser");
 
 /**
@@ -242,7 +239,7 @@ class QueryDetailBox extends React.Component{
       this.setState({
         referenceVisibility : "hidden",
         bibtexVisibility : "visible",
-        bibRefSwitchText : "References"
+        bibRefSwitchText : "HTML"
       });
     }else{
       this.setState({
@@ -272,22 +269,22 @@ class QueryDetailBox extends React.Component{
           <div>
             <DoiSubmitComponent doi={doi} uuid={this.props.reference.uuid}/>
             <p>
-              <strong>Data source </strong> : {this.props.reference.datasource}
+              <strong>VAMDC data source identifier</strong>: {this.props.reference.datasource}
             </p>
             <p>
-              <strong>Data source version </strong> : {this.props.reference.resourceversion}
+              <strong>Version of the VAMDC database producing the dataset</strong>: {this.props.reference.resourceversion}
             </p>
             <p>
-              <strong>Query </strong> : {this.props.reference.query}
+              <strong>Query originating the data</strong>: {this.props.reference.query}
             </p>
             <p>
-              <strong>Query identifier </strong> : {this.props.reference.uuid}
+              <strong>Query identifier </strong>: {this.props.reference.uuid}
             </p>
           </div>
           <div>
             <p>
-              <strong>Query result</strong> : <a href={this.props.reference.xsams}>XSAMS file</a> 
-              (if not available, please try again in a few minutes)
+              <strong>Query produced dataset</strong>: <span><a href={this.props.reference.xsams}>XSAMS file</a> </span>
+               <span> (if not available, please try again in a few minutes) </span>
             </p>
             <p>
               <strong>XSAMS version</strong> : {this.props.reference.outputformatversion}
@@ -301,7 +298,7 @@ class QueryDetailBox extends React.Component{
           </div>
           <div>
             <div className={this.state.referenceVisibility}> 
-              <p><strong>References</strong></p>          
+              <p><strong>Bibliographic references in the dataset</strong></p>          
               <div className="scrollable-div">              
                 <div>
                   {references}
@@ -320,7 +317,10 @@ class QueryDetailBox extends React.Component{
             </div>
           </div>
           <div>
-            <button onClick={this.switchReferences}><strong>{"Switch to "+ this.state.bibRefSwitchText}</strong></button>
+            <button onClick={this.switchReferences} 
+                    className="pure-button pure-button-primary">
+                <strong>{"Switch references to "+ this.state.bibRefSwitchText}</strong>
+            </button>
           </div>
         </div>
       </div>
@@ -359,9 +359,15 @@ class DoiSubmitComponent extends React.Component{
     <div>
       { this.props.doi !== null ?
       (            
-        <span><a href={"https://doi.org/"+this.props.doi} target="_blank"><img src={"https://zenodo.org/badge/DOI/"+this.props.doi+".svg"} alt="DOI"/></a></span>
+        <span>
+            <a href={"https://doi.org/"+this.props.doi} target="_blank">
+                <img src={"https://zenodo.org/badge/DOI/"+this.props.doi+".svg"} alt="DOI"/>
+            </a>
+        </span>
       ):
-      ( <span><button className="pure-button pure-button-primary" onClick={this.askForDoi}>Get a DOI</button></span>)}
+      ( <span>
+            <button className="pure-button pure-button-primary" onClick={this.askForDoi}>No DOI yet - Get one</button>
+        </span>)}
     </div>);
   }
 

@@ -633,7 +633,7 @@ class QueriesFormBox extends React.Component{
       <div id="form">
         <form className="pure-form pure-form-stacked">
           <fieldset>
-            <InputDateComponent name="from" label="Query executed between" onChange={this.props.onChange}/>
+            <InputDateComponent name="from" label="Search query performed between" onChange={this.props.onChange}/>
             <InputDateComponent name="to" label="and" onChange={this.props.onChange}/>
             <PureButtonComponent label="Submit" action={this.props.doQuery}/>
           </fieldset>
@@ -962,7 +962,7 @@ class QueriesBox extends React.Component{
   constructor(props){
     super(props);
     this.serviceMethod = "FindQueries";
-    this.tableHeader = ['Request', 'Accessed resource', 'Last execution','UUID'];
+    this.tableHeader = ['Query', 'VAMDC data source', 'Last execution','UUID'];
     this.tableHeaderMapping = {  'Request': {
                             field:'parameters',
                             type: tableCellFactory.cellTypes.query},
@@ -1151,7 +1151,7 @@ class QueriesBox extends React.Component{
                           elementId="nodesboxes"
                           toggled={this.toggled}
                           toggleAll={this.toggleAll}
-                          title="Accessed resources"/>
+                          title="VAMDC data source filter"/>
                         </div>;
 
     return(
@@ -1221,7 +1221,6 @@ function CreditsBox(props){
   );
 };
 
-
 /**
  * Displays text in a paragraph
  * @param text
@@ -1277,7 +1276,7 @@ class MainComponent extends React.Component{
     return {  'Home' : <HomePageBox />,
               'Queries': <QueriesBox serviceApi={this.props.serviceApi}/>,
               'Credits': <CreditsBox />,
-              'Data policy' : <DataPolicy />,
+              'Data policy' : <DataPolicy />
           };
   }
 
