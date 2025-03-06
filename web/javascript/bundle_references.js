@@ -20816,8 +20816,8 @@ var QueryDetailBox = function (_React$Component3) {
         var bibtex = parse(this.props.reference.bibtex);
         var i = 1;
         for (var k in bibtex) {
-          if (StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available") {
-
+          //if( StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available"){
+          if (StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k]) !== 'N.N.') {
             result.push(React.createElement(
               'ul',
               { key: i },
@@ -20902,38 +20902,17 @@ var QueryDetailBox = function (_React$Component3) {
             i++;
             result.push(React.createElement('hr', { key: i }));
             i++;
-          } else {
-            if (StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k]) !== 'N.N.') {
-              result.push(React.createElement(
-                'ul',
-                { key: i },
-                React.createElement(
-                  'li',
-                  null,
-                  React.createElement(
-                    'span',
-                    { className: 'underline' },
-                    'Reference name in bibtex'
-                  ),
-                  ' : ',
-                  k
-                ),
-                React.createElement(
-                  'li',
-                  null,
-                  React.createElement(
-                    'span',
-                    { className: 'underline' },
-                    'Error'
-                  ),
-                  ': title is missing, please check bibtex source code to get more information.'
-                )
-              ));
-              i++;
-              result.push(React.createElement('hr', { key: i }));
-              i++;
-            }
-          }
+          } /*else{
+             if(StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k]) !== 'N.N.'){
+               result.push(<ul key={i}>
+                 <li><span className="underline">Reference name in bibtex</span> : {k}</li>
+                 <li><span className="underline">Error</span>: title is missing, please check bibtex source code to get more information.</li>
+                 </ul>)
+               i++;
+               result.push(<hr key={i}/>)
+               i++;
+             }
+            }*/
         }
         //no reference found
         if (bibtex !== '' && result.length === 0) {

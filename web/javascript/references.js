@@ -159,8 +159,8 @@ class QueryDetailBox extends React.Component{
       var bibtex = parse(this.props.reference.bibtex);
       var i = 1;
       for (var k in bibtex) {
-        if( StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available"){
-          
+        //if( StoreUtilities.getPropertyInObject("TITLE", bibtex[k]) !== "not available"){
+        if(StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k]) !== 'N.N.'){
           result.push(
             <ul key={i}>
                 <li><span className="underline">Title</span> : {StoreUtilities.getPropertyInObject("TITLE", bibtex[k])}</li>
@@ -174,7 +174,7 @@ class QueryDetailBox extends React.Component{
           i++;
           result.push(<hr key={i}/>)
           i++;
-        }else{
+        }/*else{
           if(StoreUtilities.getPropertyInObject("AUTHOR", bibtex[k]) !== 'N.N.'){
             result.push(<ul key={i}>
               <li><span className="underline">Reference name in bibtex</span> : {k}</li>
@@ -184,7 +184,7 @@ class QueryDetailBox extends React.Component{
             result.push(<hr key={i}/>)
             i++;
           }
-        }
+        }*/
       }
       //no reference found
       if(bibtex !== '' && result.length === 0){
